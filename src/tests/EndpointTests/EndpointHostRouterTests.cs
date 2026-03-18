@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace EndpointTests
@@ -111,7 +112,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_EmptyEndpointList_ReturnsNull()
+        public void RouterFind_EmptyEndpointList_ReturnsNull_Test()
         {
             var ctx = new DefaultHttpContext
             {
@@ -124,12 +125,8 @@ namespace EndpointTests
             Assert.IsNull(result);
         }
 
-        // ---------------------------------------------------------------
-        // Disabled endpoint (IsActive = false)
-        // ---------------------------------------------------------------
-
         [TestMethod]
-        public void RouterFind_DisabledEndpoint_ReturnsNull()
+        public void RouterFind_DisabledEndpoint_ReturnsNull_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), isActive: false));
 
@@ -145,7 +142,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_ActiveEndpoint_ReturnsHandler()
+        public void RouterFind_ActiveEndpoint_ReturnsHandler_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), isActive: true));
 
@@ -161,7 +158,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_UpperCasePath_MatchesCaseInsensitively()
+        public void RouterFind_UpperCasePath_MatchesCaseInsensitively_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/endpoint1", typeof(EndpointOneHandler)));
 
@@ -178,7 +175,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_MixedCasePath_MatchesCaseInsensitively()
+        public void RouterFind_MixedCasePath_MatchesCaseInsensitively_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/MyEndpoint", typeof(EndpointOneHandler)));
 
@@ -194,9 +191,9 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_MatchingHttpMethod_ReturnsHandler()
+        public void RouterFind_MatchingHttpMethod_ReturnsHandler_Test()
         {
-            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { "GET" }));
+            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { HttpMethod.Get }));
 
             var ctx = new DefaultHttpContext
             {
@@ -211,9 +208,9 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_NonMatchingHttpMethod_ReturnsNull()
+        public void RouterFind_NonMatchingHttpMethod_ReturnsNull_Test()
         {
-            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { "GET" }));
+            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { HttpMethod.Get }));
 
             var ctx = new DefaultHttpContext
             {
@@ -227,9 +224,9 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_HttpMethodCaseInsensitive_ReturnsHandler()
+        public void RouterFind_HttpMethodCaseInsensitive_ReturnsHandler_Test()
         {
-            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { "GET" }));
+            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { HttpMethod.Get }));
 
             var ctx = new DefaultHttpContext
             {
@@ -243,9 +240,9 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_MultipleAllowedMethods_MatchesAllOfThem()
+        public void RouterFind_MultipleAllowedMethods_MatchesAllOfThem_Test()
         {
-            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { "GET", "POST", "PUT" }));
+            _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler), new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put }));
 
             foreach (var method in new[] { "GET", "POST", "PUT" })
             {
@@ -261,7 +258,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_NoAllowedMethodsConstraint_AcceptsAnyMethod()
+        public void RouterFind_NoAllowedMethodsConstraint_AcceptsAnyMethod_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler)));
 
@@ -279,10 +276,10 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_SamePathDifferentMethods_RoutesCorrectly()
+        public void RouterFind_SamePathDifferentMethods_RoutesCorrectly_Test()
         {
-            _endpoints.Add(new Endpoint("ep-get", "/resource", typeof(EndpointOneHandler), new[] { "GET" }));
-            _endpoints.Add(new Endpoint("ep-post", "/resource", typeof(EndpointTwoHandler), new[] { "POST" }));
+            _endpoints.Add(new Endpoint("ep-get", "/resource", typeof(EndpointOneHandler), new[] { HttpMethod.Get }));
+            _endpoints.Add(new Endpoint("ep-post", "/resource", typeof(EndpointTwoHandler), new[] { HttpMethod.Post }));
 
             var getCtx = new DefaultHttpContext
             {
@@ -305,7 +302,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterExist_MatchingPath_ReturnsTrue()
+        public void RouterExist_MatchingPath_ReturnsTrue_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler)));
 
@@ -318,7 +315,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterExist_NonMatchingPath_ReturnsFalse()
+        public void RouterExist_NonMatchingPath_ReturnsFalse_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler)));
 
@@ -331,7 +328,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterExist_EmptyEndpoints_ReturnsFalse()
+        public void RouterExist_EmptyEndpoints_ReturnsFalse_Test()
         {
             var ctx = new DefaultHttpContext
             {
@@ -342,7 +339,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task RouterExistAsync_MatchingPath_ReturnsTrue()
+        public async Task RouterExistAsync_MatchingPath_ReturnsTrue_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler)));
 
@@ -357,7 +354,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task RouterExistAsync_NonMatchingPath_ReturnsFalse()
+        public async Task RouterExistAsync_NonMatchingPath_ReturnsFalse_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler)));
 
@@ -372,7 +369,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterExist_IsCaseInsensitive()
+        public void RouterExist_IsCaseInsensitive_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/endpoint1", typeof(EndpointOneHandler)));
 
@@ -385,7 +382,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_ThreeEndpoints_EachResolvesCorrectly()
+        public void RouterFind_ThreeEndpoints_EachResolvesCorrectly_Test()
         {
             _endpoints.Add(new Endpoint("ep1", "/ep1", typeof(EndpointOneHandler)));
             _endpoints.Add(new Endpoint("ep2", "/ep2", typeof(EndpointTwoHandler)));
@@ -412,7 +409,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RouterFind_FirstMatchIsInactive_ReturnsNull()
+        public void RouterFind_FirstMatchIsInactive_ReturnsNull_Test()
         {
             // Adds inactive ep1 first; the router's FirstOrDefault picks the inactive one.
             _endpoints.Add(new Endpoint("ep1-inactive", "/resource", typeof(EndpointOneHandler), isActive: false));

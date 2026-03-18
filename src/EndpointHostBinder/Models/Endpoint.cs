@@ -23,6 +23,7 @@ using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
 #endregion
 
@@ -81,7 +82,7 @@ namespace EndpointHostBinder.Models
         ///     HTTP methods are accepted.
         /// </summary>
         /// =================================================================================================
-        public IEnumerable<string> AllowedMethods { get; private set; }
+        public IEnumerable<HttpMethod> AllowedMethods { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -113,9 +114,9 @@ namespace EndpointHostBinder.Models
         /// <param name="name">The endpoint name.</param>
         /// <param name="path">Full pathname of the resource.</param>
         /// <param name="type">The handler type.</param>
-        /// <param name="allowedMethods">Allowed HTTP methods (e.g. "GET", "POST"). Pass null or empty to allow all methods.</param>
+        /// <param name="allowedMethods">Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>). Pass null or empty to allow all methods.</param>
         /// =================================================================================================
-        public Endpoint(string name, PathString path, Type type, string[] allowedMethods)
+        public Endpoint(string name, PathString path, Type type, HttpMethod[] allowedMethods)
             : this(name, path, type, true, allowedMethods) { }
 
         /// -------------------------------------------------------------------------------------------------
@@ -126,9 +127,9 @@ namespace EndpointHostBinder.Models
         /// <param name="path">Full pathname of the resource.</param>
         /// <param name="type">The handler type.</param>
         /// <param name="isActive">True if the endpoint is active, false if not.</param>
-        /// <param name="allowedMethods">Allowed HTTP methods (e.g. "GET", "POST"). Pass null or empty to allow all methods.</param>
+        /// <param name="allowedMethods">Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>). Pass null or empty to allow all methods.</param>
         /// =================================================================================================
-        public Endpoint(string name, PathString path, Type type, bool isActive, string[] allowedMethods)
+        public Endpoint(string name, PathString path, Type type, bool isActive, HttpMethod[] allowedMethods)
         {
             if (name.IsMissing())
                 throw new ArgumentException("Endpoint name cannot be null, empty, or whitespace.", nameof(name));
@@ -142,7 +143,7 @@ namespace EndpointHostBinder.Models
             EndpointType = type;
             IsActive = isActive;
             AllowedMethods = allowedMethods.IsNotNullOrEmptyEnumerable()
-                ? new List<string>(allowedMethods)
+                ? allowedMethods
                 : null;
         }
     }

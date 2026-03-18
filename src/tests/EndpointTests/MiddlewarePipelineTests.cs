@@ -28,6 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace EndpointTests
     public class MiddlewarePipelineTests
     {
         [TestMethod]
-        public async Task Invoke_MatchedEndpoint_WritesResponseAndShortCircuits()
+        public async Task Invoke_MatchedEndpoint_WritesResponseAndShortCircuits_Test()
         {
             var (middleware, router, ctx) = BuildPipeline("/func", "GET",
                 out var nextWasCalled,
@@ -57,7 +58,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task Invoke_UnmatchedPath_CallsNextMiddleware()
+        public async Task Invoke_UnmatchedPath_CallsNextMiddleware_Test()
         {
             var (middleware, router, ctx) = BuildPipeline("/unknown", "GET",
                 out var nextWasCalled,
@@ -70,7 +71,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task Invoke_DisabledEndpoint_CallsNextMiddleware()
+        public async Task Invoke_DisabledEndpoint_CallsNextMiddleware_Test()
         {
             var (middleware, router, ctx) = BuildPipeline("/func", "GET",
                 out var nextWasCalled,
@@ -83,12 +84,12 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task Invoke_MethodNotAllowed_CallsNextMiddleware()
+        public async Task Invoke_MethodNotAllowed_CallsNextMiddleware_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
                 .RegisterEndpointHostBuilder()
-                .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", new[] { "GET" });
+                .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", new[] { HttpMethod.Get });
 
             var provider = services.BuildServiceProvider();
             var router = provider.GetRequiredService<IEndpointHostRouter>() as EndpointHostRouter;
@@ -112,7 +113,7 @@ namespace EndpointTests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Invoke_HandlerThrows_ExceptionBubblesUp()
+        public async Task Invoke_HandlerThrows_ExceptionBubblesUp_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -132,7 +133,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task Invoke_CancellationTokenForwarded_ToHandlerAndResult()
+        public async Task Invoke_CancellationTokenForwarded_ToHandlerAndResult_Test()
         {
             var cts = new CancellationTokenSource();
             var receivedToken = CancellationToken.None;
@@ -164,7 +165,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public async Task Invoke_MultipleSequentialRequests_AllHandledCorrectly()
+        public async Task Invoke_MultipleSequentialRequests_AllHandledCorrectly_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()

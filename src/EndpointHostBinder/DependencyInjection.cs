@@ -21,6 +21,7 @@ using EndpointHostBinder.Host;
 using EndpointHostBinder.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 
 #endregion
 
@@ -139,7 +140,7 @@ namespace EndpointHostBinder
         /// </returns>
         /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder, string name, string path, 
-            string[] allowedMethods)
+            HttpMethod[] allowedMethods)
             where T : class, IEndpointHostRequestHandler
         {
             builder.AddTransient<T>();
@@ -163,7 +164,7 @@ namespace EndpointHostBinder
         /// </returns>
         /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder, string name, string path, bool isActive,
-            string[] allowedMethods)
+            HttpMethod[] allowedMethods)
             where T : class, IEndpointHostRequestHandler
         {
             builder.AddTransient<T>();

@@ -27,6 +27,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 #endregion
@@ -76,7 +77,7 @@ namespace EndpointHostBinder.Host
             var endpoint = _endpoints.FirstOrDefault(x =>
                 x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase) &&
                 (x.AllowedMethods.IsNullOrEmptyEnumerable() ||
-                 x.AllowedMethods.Any(m => string.Equals(m, context.Request.Method, StringComparison.OrdinalIgnoreCase))));
+                 x.AllowedMethods.Any(m => m == new HttpMethod(context.Request.Method))));
 
             if (endpoint.IsNull())
             {

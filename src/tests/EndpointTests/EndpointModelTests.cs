@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 #endregion
 
@@ -32,32 +33,28 @@ namespace EndpointTests
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Endpoint_NullName_ThrowsArgumentException() => _ = new Endpoint(null, "/path", typeof(EndpointOneHandler));
+        public void Endpoint_NullName_ThrowsArgumentException_Test() => _ = new Endpoint(null, "/path", typeof(EndpointOneHandler));
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Endpoint_EmptyName_ThrowsArgumentException() => _ = new Endpoint("", "/path", typeof(EndpointOneHandler));
+        public void Endpoint_EmptyName_ThrowsArgumentException_Test() => _ = new Endpoint("", "/path", typeof(EndpointOneHandler));
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Endpoint_WhitespaceName_ThrowsArgumentException() => _ = new Endpoint("   ", "/path", typeof(EndpointOneHandler));
-
-        // ---------------------------------------------------------------
-        // Type validation
-        // ---------------------------------------------------------------
+        public void Endpoint_WhitespaceName_ThrowsArgumentException_Test() => _ = new Endpoint("   ", "/path", typeof(EndpointOneHandler));
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Endpoint_NullType_ThrowsArgumentNullException() => _ = new Endpoint("ep", "/path", null);
+        public void Endpoint_NullType_ThrowsArgumentNullException_Test() => _ = new Endpoint("ep", "/path", null);
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Endpoint_TypeNotImplementingInterface_ThrowsArgumentException() =>
+        public void Endpoint_TypeNotImplementingInterface_ThrowsArgumentException_Test() =>
             // string does not implement IEndpointHostRequestHandler
             _ = new Endpoint("ep", "/path", typeof(string));
 
         [TestMethod]
-        public void Endpoint_ValidArgs_PropertiesSetCorrectly()
+        public void Endpoint_ValidArgs_PropertiesSetCorrectly_Test()
         {
             var ep = new Endpoint("myEndpoint", "/mypath", typeof(EndpointOneHandler));
 
@@ -69,7 +66,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void Endpoint_IsActiveFalse_PropertyCorrect()
+        public void Endpoint_IsActiveFalse_PropertyCorrect_Test()
         {
             var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), false);
 
@@ -77,7 +74,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void Endpoint_IsActiveTrue_PropertyCorrect()
+        public void Endpoint_IsActiveTrue_PropertyCorrect_Test()
         {
             var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), true);
 
@@ -85,44 +82,44 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void Endpoint_AllowedMethodsSetCorrectly()
+        public void Endpoint_AllowedMethodsSetCorrectly_Test()
         {
-            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), new[] { "GET", "POST" });
+            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), new[] { HttpMethod.Get, HttpMethod.Post });
 
             Assert.IsNotNull(ep.AllowedMethods);
-            CollectionAssert.AreEquivalent(new[] { "GET", "POST" }, ep.AllowedMethods.ToArray());
+            CollectionAssert.AreEquivalent(new[] { HttpMethod.Get, HttpMethod.Post }, ep.AllowedMethods.ToArray());
         }
 
         [TestMethod]
-        public void Endpoint_NullAllowedMethods_PropertyIsNull()
+        public void Endpoint_NullAllowedMethods_PropertyIsNull_Test()
         {
-            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), null);
+            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), (HttpMethod[])null);
 
             Assert.IsNull(ep.AllowedMethods);
         }
 
         [TestMethod]
-        public void Endpoint_EmptyAllowedMethods_PropertyIsNull()
+        public void Endpoint_EmptyAllowedMethods_PropertyIsNull_Test()
         {
-            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), new string[0]);
+            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), new HttpMethod[0]);
 
             Assert.IsNull(ep.AllowedMethods);
         }
 
         [TestMethod]
-        public void Endpoint_AllowedMethodsWithIsActive_AllPropertiesCorrect()
+        public void Endpoint_AllowedMethodsWithIsActive_AllPropertiesCorrect_Test()
         {
-            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), false, new[] { "DELETE" });
+            var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandler), false, new[] { HttpMethod.Delete });
 
             Assert.IsFalse(ep.IsActive);
             Assert.IsNotNull(ep.AllowedMethods);
-            CollectionAssert.AreEquivalent(new[] { "DELETE" }, ep.AllowedMethods.ToArray());
+            CollectionAssert.AreEquivalent(new[] { HttpMethod.Delete }, ep.AllowedMethods.ToArray());
         }
 
         [TestMethod]
-        public void Endpoint_DerivedHandlerType_AcceptedByIsAssignableFrom()
+        public void Endpoint_DerivedHandlerType_AcceptedByIsAssignableFrom_Test()
         {
-            // EndpointOneHandler → EndpointOneHandlerDerived should still be valid
+            // EndpointOneHandler -> EndpointOneHandlerDerived and should still be valid
             var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandlerDerived));
 
             Assert.AreEqual(typeof(EndpointOneHandlerDerived), ep.EndpointType);

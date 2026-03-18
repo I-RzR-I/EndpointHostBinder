@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Net.Http;
 
 #endregion
 
@@ -33,7 +34,7 @@ namespace EndpointTests
     public class DependencyInjectionTests
     {
         [TestMethod]
-        public void RegisterEndpointHostBuilder_RegistersIEndpointHostRouter()
+        public void RegisterEndpointHostBuilder_RegistersIEndpointHostRouter_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -47,7 +48,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void RegisterEndpointHostBuilder_RouterIsSingleton()
+        public void RegisterEndpointHostBuilder_RouterIsSingleton_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -62,7 +63,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_RegistersHandlerAsTransient()
+        public void AddHostEndpoint_RegistersHandlerAsTransient_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -79,7 +80,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_RegistersEndpointAsSingleton()
+        public void AddHostEndpoint_RegistersEndpointAsSingleton_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -95,7 +96,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_EndpointHasCorrectNameAndPath()
+        public void AddHostEndpoint_EndpointHasCorrectNameAndPath_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -112,7 +113,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_WithIsActiveFalse_EndpointRegisteredInactive()
+        public void AddHostEndpoint_WithIsActiveFalse_EndpointRegisteredInactive_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -127,28 +128,28 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_WithAllowedMethods_EndpointHasCorrectMethods()
+        public void AddHostEndpoint_WithAllowedMethods_EndpointHasCorrectMethods_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
                 .RegisterEndpointHostBuilder()
-                .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", new[] { "GET", "POST" });
+                .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", new[] { HttpMethod.Get, HttpMethod.Post });
 
             var provider = services.BuildServiceProvider();
 
             var ep = provider.GetServices<Endpoint>().Single();
 
             Assert.IsNotNull(ep.AllowedMethods);
-            CollectionAssert.AreEquivalent(new[] { "GET", "POST" }, ep.AllowedMethods.ToArray());
+            CollectionAssert.AreEquivalent(new[] { HttpMethod.Get, HttpMethod.Post }, ep.AllowedMethods.ToArray());
         }
 
         [TestMethod]
-        public void AddHostEndpoint_WithIsActiveAndAllowedMethods_AllPropertiesCorrect()
+        public void AddHostEndpoint_WithIsActiveAndAllowedMethods_AllPropertiesCorrect_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
                 .RegisterEndpointHostBuilder()
-                .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", true, new[] { "DELETE" });
+                .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", true, new[] { HttpMethod.Delete });
 
             var provider = services.BuildServiceProvider();
 
@@ -156,13 +157,13 @@ namespace EndpointTests
 
             Assert.IsTrue(ep.IsActive);
             Assert.IsNotNull(ep.AllowedMethods);
-            CollectionAssert.AreEquivalent(new[] { "DELETE" }, ep.AllowedMethods.ToArray());
+            CollectionAssert.AreEquivalent(new[] { HttpMethod.Delete }, ep.AllowedMethods.ToArray());
         }
 
         [TestMethod]
-        public void AddHostEndpoint_PreBuiltEndpoint_RegisteredCorrectly()
+        public void AddHostEndpoint_PreBuiltEndpoint_RegisteredCorrectly_Test()
         {
-            var preBuilt = new Endpoint("pre", "/pre", typeof(FunctionalEndpointHandler), false, new[] { "PATCH" });
+            var preBuilt = new Endpoint("pre", "/pre", typeof(FunctionalEndpointHandler), false, new[] { HttpMethod.Patch });
 
             var services = new ServiceCollection()
                 .AddLogging()
@@ -179,7 +180,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_MultipleEndpoints_AllRegistered()
+        public void AddHostEndpoint_MultipleEndpoints_AllRegistered_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -199,7 +200,7 @@ namespace EndpointTests
         }
 
         [TestMethod]
-        public void AddHostEndpoint_RouterCanResolveAllRegisteredHandlers()
+        public void AddHostEndpoint_RouterCanResolveAllRegisteredHandlers_Test()
         {
             var services = new ServiceCollection()
                 .AddLogging()

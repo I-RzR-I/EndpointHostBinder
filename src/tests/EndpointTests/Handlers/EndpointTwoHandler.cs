@@ -16,6 +16,7 @@
 
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EndpointTests.Handlers
@@ -23,7 +24,8 @@ namespace EndpointTests.Handlers
     public class EndpointTwoHandler : IEndpointHostRequestHandler
     {
         /// <inheritdoc />
-        public async Task<IEndpointHostResult> RequestProcessAsync(HttpContext context) 
+        public async Task<IEndpointHostResult> RequestProcessAsync(HttpContext context, 
+            CancellationToken cancellationToken = default) 
             => throw new System.NotImplementedException();
 
         /// <inheritdoc />

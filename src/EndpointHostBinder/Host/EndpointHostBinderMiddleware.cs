@@ -17,7 +17,7 @@
 #region U S A G E S
 
 using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
+using DomainCommonExtensions.Utilities.Ensure;
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -84,12 +84,12 @@ namespace EndpointHostBinder.Host
                 {
                     _logger.LogInformation("Invoking endpoint: {endpointType} for {url}", endpoint.GetType().FullName, context.Request.Path.ToString());
 
-                    var result = await endpoint.RequestProcessAsync(context);
+                    var result = await endpoint.RequestProcessAsync(context, context.RequestAborted);
 
                     if (result.IsNotNull())
                     {
                         _logger.LogTrace("Invoking result: {type}", result.GetType().FullName);
-                        await result.ExecuteAsync(context);
+                        await result.ExecuteAsync(context, context.RequestAborted);
                     }
 
                     return;

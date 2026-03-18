@@ -45,7 +45,7 @@ namespace EndpointHostBinder
         /// =================================================================================================
         public static IServiceCollection RegisterEndpointHostBuilder(this IServiceCollection builder)
         {
-            builder.AddTransient<IEndpointHostRouter, EndpointHostRouter>();
+            builder.AddSingleton<IEndpointHostRouter, EndpointHostRouter>();
 
             return builder;
         }
@@ -121,6 +121,53 @@ namespace EndpointHostBinder
         {
             builder.AddTransient<T>();
             builder.AddSingleton(endpoint);
+
+            return builder;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     An IServiceCollection extension method that adds a host endpoint with HTTP method constraints.
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter.</typeparam>
+        /// <param name="builder">The builder to act on.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="path">Full pathname of the resource.</param>
+        /// <param name="allowedMethods">Allowed HTTP methods (e.g. "GET", "POST"). Pass null or empty to allow all methods.</param>
+        /// <returns>
+        ///     An IServiceCollection.
+        /// </returns>
+        /// =================================================================================================
+        public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder, string name, string path, 
+            string[] allowedMethods)
+            where T : class, IEndpointHostRequestHandler
+        {
+            builder.AddTransient<T>();
+            builder.AddSingleton(new Endpoint(name, path, typeof(T), allowedMethods));
+
+            return builder;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     An IServiceCollection extension method that adds a host endpoint with an active flag and HTTP method constraints.
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter.</typeparam>
+        /// <param name="builder">The builder to act on.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="path">Full pathname of the resource.</param>
+        /// <param name="isActive">True if is active, false if not.</param>
+        /// <param name="allowedMethods">Allowed HTTP methods (e.g. "GET", "POST"). Pass null or empty to allow all methods.</param>
+        /// <returns>
+        ///     An IServiceCollection.
+        /// </returns>
+        /// =================================================================================================
+        public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder, string name, string path, bool isActive,
+            string[] allowedMethods)
+            where T : class, IEndpointHostRequestHandler
+        {
+            builder.AddTransient<T>();
+            builder.AddSingleton(new Endpoint(name, path, typeof(T), isActive, allowedMethods));
 
             return builder;
         }

@@ -16,7 +16,10 @@
 
 #region U S A G E S
 
+using DomainCommonExtensions.ArraysExtensions;
+using DomainCommonExtensions.CommonExtensions;
 using DomainCommonExtensions.DataTypeExtensions;
+using DomainCommonExtensions.Utilities.Ensure;
 using EndpointHostBinder.Abstractions;
 using EndpointHostBinder.Models;
 using Microsoft.AspNetCore.Http;
@@ -70,17 +73,21 @@ namespace EndpointHostBinder.Host
         {
             context.ThrowIfArgNull(nameof(context));
 
-            if (Exist(context).IsFalse())
+            var endpoint = _endpoints.FirstOrDefault(x =>
+                x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase) &&
+                (x.AllowedMethods.IsNullOrEmptyEnumerable() ||
+                 x.AllowedMethods.Any(m => string.Equals(m, context.Request.Method, StringComparison.OrdinalIgnoreCase))));
+
+            if (endpoint.IsNull())
             {
                 _logger.LogDebug("Request path [{path}] no match any endpoints", context.Request.Path);
 
                 return null;
             }
 
-            var endpoint = _endpoints.FirstOrDefault(x => x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase));
             _logger.LogDebug("Request path [{path}] matched to endpoint type [{endpoint}]", context.Request.Path, endpoint!.Name);
 
-            if (endpoint.IsActive.IsTrue())
+            if (endpoint!.IsActive.IsTrue())
             {
                 var handler = context.RequestServices.GetService(endpoint.EndpointType);
                 if (handler is IEndpointHostRequestHandler hostHandler)
@@ -107,7 +114,11 @@ namespace EndpointHostBinder.Host
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExistAsync(HttpContext context)
-            => await Task.Run(() => Exist(context));
+        public Task<bool> ExistAsync(HttpContext context)
+        {
+            context.ThrowIfArgNull(nameof(context));
+
+            return Task.FromResult(Exist(context));
+        }
     }
 }

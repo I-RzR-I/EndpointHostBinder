@@ -16,11 +16,13 @@
 
 #region U S A G E S
 
+using DomainCommonExtensions.ArraysExtensions;
+using DomainCommonExtensions.CommonExtensions;
 using DomainCommonExtensions.DataTypeExtensions;
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 #endregion
 
@@ -75,22 +77,11 @@ namespace EndpointHostBinder.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Endpoint" /> class.
+        ///     Gets the HTTP methods allowed for this endpoint. When <see langword="null" /> or empty, all
+        ///     HTTP methods are accepted.
         /// </summary>
-        /// <param name="name">The endpoint name.</param>
-        /// <param name="path">Full pathname of the resource.</param>
-        /// <param name="type">The type.</param>
         /// =================================================================================================
-        public Endpoint(string name, PathString path, Type type)
-        {
-            if (type.GetInterfaces().Any(x => x.Name == nameof(IEndpointHostRequestHandler)).IsFalse())
-                throw new Exception("Endpoint type is not typeof(IEndpointHostHandler)");
-
-            Name = name;
-            Path = path;
-            EndpointType = type;
-            IsActive = true;
-        }
+        public IEnumerable<string> AllowedMethods { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -98,18 +89,61 @@ namespace EndpointHostBinder.Models
         /// </summary>
         /// <param name="name">The endpoint name.</param>
         /// <param name="path">Full pathname of the resource.</param>
-        /// <param name="type">The type.</param>
-        /// <param name="isActive">True if is active, false if not.</param>
+        /// <param name="type">The handler type.</param>
+        /// =================================================================================================
+        public Endpoint(string name, PathString path, Type type)
+            : this(name, path, type, true, null) { }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Endpoint" /> class.
+        /// </summary>
+        /// <param name="name">The endpoint name.</param>
+        /// <param name="path">Full pathname of the resource.</param>
+        /// <param name="type">The handler type.</param>
+        /// <param name="isActive">True if the endpoint is active, false if not.</param>
         /// =================================================================================================
         public Endpoint(string name, PathString path, Type type, bool isActive)
+            : this(name, path, type, isActive, null) { }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method constraints.
+        /// </summary>
+        /// <param name="name">The endpoint name.</param>
+        /// <param name="path">Full pathname of the resource.</param>
+        /// <param name="type">The handler type.</param>
+        /// <param name="allowedMethods">Allowed HTTP methods (e.g. "GET", "POST"). Pass null or empty to allow all methods.</param>
+        /// =================================================================================================
+        public Endpoint(string name, PathString path, Type type, string[] allowedMethods)
+            : this(name, path, type, true, allowedMethods) { }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method constraints.
+        /// </summary>
+        /// <param name="name">The endpoint name.</param>
+        /// <param name="path">Full pathname of the resource.</param>
+        /// <param name="type">The handler type.</param>
+        /// <param name="isActive">True if the endpoint is active, false if not.</param>
+        /// <param name="allowedMethods">Allowed HTTP methods (e.g. "GET", "POST"). Pass null or empty to allow all methods.</param>
+        /// =================================================================================================
+        public Endpoint(string name, PathString path, Type type, bool isActive, string[] allowedMethods)
         {
-            if (type.GetInterfaces().Any(x => x.Name == nameof(IEndpointHostRequestHandler)).IsFalse())
-                throw new Exception("Endpoint type is not typeof(IEndpointHostHandler)");
+            if (name.IsMissing())
+                throw new ArgumentException("Endpoint name cannot be null, empty, or whitespace.", nameof(name));
+            if (type.IsNull())
+                throw new ArgumentNullException(nameof(type));
+            if (!typeof(IEndpointHostRequestHandler).IsAssignableFrom(type))
+                throw new ArgumentException($"Type '{type.Name}' must implement {nameof(IEndpointHostRequestHandler)}.", nameof(type));
 
             Name = name;
             Path = path;
             EndpointType = type;
             IsActive = isActive;
+            AllowedMethods = allowedMethods.IsNotNullOrEmptyEnumerable()
+                ? new List<string>(allowedMethods)
+                : null;
         }
     }
 }

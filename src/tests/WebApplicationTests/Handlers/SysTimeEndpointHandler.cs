@@ -18,6 +18,7 @@ using DomainCommonExtensions.DataTypeExtensions;
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using WebApplicationTests.Results;
 
@@ -26,8 +27,14 @@ namespace WebApplicationTests.Handlers
     public class SysTimeEndpointHandler : IEndpointHostRequestHandler
     {
         /// <inheritdoc />
-        public async Task<IEndpointHostResult> RequestProcessAsync(HttpContext context)
-            => await Task.Run(() => RequestProcess(context));
+        public Task<IEndpointHostResult> RequestProcessAsync(HttpContext context, CancellationToken cancellationToken = default)
+        {
+            IEndpointHostResult result = HttpMethods.IsGet(context.Request.Method).IsFalse()
+                ? new StatusCodeResult(HttpStatusCode.MethodNotAllowed)
+                : new SysTimeEndpointResult();
+
+            return Task.FromResult(result);
+        }
 
         /// <inheritdoc />
         public IEndpointHostResult RequestProcess(HttpContext context)

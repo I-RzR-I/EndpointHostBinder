@@ -17,6 +17,7 @@
 #region U S A G E S
 
 using Microsoft.AspNetCore.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 #endregion
@@ -35,11 +36,14 @@ namespace EndpointHostBinder.Abstractions
         ///     Executes the 'asynchronous' operation.
         /// </summary>
         /// <param name="context">The context.</param>
+        /// <param name="cancellationToken">
+        ///     (Optional) A token that allows processing to be cancelled.
+        /// </param>
         /// <returns>
         ///     A Task.
         /// </returns>
         /// =================================================================================================
-        Task ExecuteAsync(HttpContext context);
+        Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

@@ -17,6 +17,7 @@
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebApplicationTests.Results
@@ -24,8 +25,12 @@ namespace WebApplicationTests.Results
     public class SysTimeEndpointResult : IEndpointHostResult
     {
         /// <inheritdoc />
-        public async Task ExecuteAsync(HttpContext context)
-            => await Task.Run(() => Execute(context));
+        public Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default)
+        {
+            Execute(context);
+
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc />
         public void Execute(HttpContext context) => context.Response.WriteAsync($"{DateTime.Now}");

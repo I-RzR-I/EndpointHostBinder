@@ -16,6 +16,7 @@
 
 #region U S A G E S
 
+using EndpointHostBinder.Models;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -25,40 +26,49 @@ namespace EndpointHostBinder.Abstractions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Interface for endpoint host router.
+    ///     Defines the contract for matching an incoming HTTP request to a registered
+    ///     <see cref="Endpoint"/> by comparing the request path and HTTP method against the
+    ///     collection of registered, active endpoints.
     /// </summary>
     /// =================================================================================================
     public interface IEndpointHostRouter
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Searches for the first match for the given HTTP context.
+        ///     Finds the registered <see cref="Endpoint"/> whose path and allowed HTTP methods match
+        ///     the current request.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="context">The current HTTP context containing the request to match.</param>
         /// <returns>
-        ///     An IEndpointHostHandler.
+        ///     The matching active <see cref="Endpoint"/> if one is found; <see langword="null"/> if no
+        ///     endpoint matches the request path and HTTP method, or if the matched endpoint is
+        ///     currently inactive.
         /// </returns>
         /// =================================================================================================
-        IEndpointHostRequestHandler Find(HttpContext context);
+        Endpoint Find(HttpContext context);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Exists the given context.
+        ///     Determines whether a registered, active endpoint matches the path and HTTP method of
+        ///     the incoming request.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="context">The current HTTP context containing the request to check.</param>
         /// <returns>
-        ///     True if it succeeds, false if it fails.
+        ///     <see langword="true"/> if a matching active endpoint exists; otherwise
+        ///     <see langword="false"/>.
         /// </returns>
         /// =================================================================================================
         bool Exist(HttpContext context);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Exist asynchronous.
+        ///     Asynchronously determines whether a registered, active endpoint matches the path and
+        ///     HTTP method of the incoming request.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="context">The current HTTP context containing the request to check.</param>
         /// <returns>
-        ///     The exist.
+        ///     A <see cref="Task{TResult}"/> whose result is <see langword="true"/> if a matching
+        ///     active endpoint exists; otherwise <see langword="false"/>.
         /// </returns>
         /// =================================================================================================
         Task<bool> ExistAsync(HttpContext context);

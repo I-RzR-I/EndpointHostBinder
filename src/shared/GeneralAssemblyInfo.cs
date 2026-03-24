@@ -18,6 +18,7 @@
 
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 
 #endregion
 
@@ -29,7 +30,7 @@ using System.Resources;
 
 [assembly: AssemblyCompany("RzR ®")]
 [assembly: AssemblyProduct("EndpointHostBinder")]
-[assembly: AssemblyCopyright("Copyright © 2022-2024 RzR All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2022-2026 RzR All rights reserved.")]
 [assembly: AssemblyTrademark("® RzR™")]
 [assembly: AssemblyDescription("A middleware that listens to application requests and validates them, allows them to be processed by `IEndpointHostRequestHandler` and `IEndpointHostResult`. Allow to expose application endpoint, without any (bypassing) controllers.")]
 
@@ -38,6 +39,6 @@ using System.Resources;
 [assembly: AssemblyMetadata("ContactName", "RzR")]
 [assembly: AssemblyMetadata("ContactEmail", "ddpRzR@hotmail.com")]
 [assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.MainAssembly)]
-[assembly: AssemblyVersion("1.0.2.8175")]
-[assembly: AssemblyFileVersion("1.0.2.8175")]
-[assembly: AssemblyInformationalVersion("1.0.2.8175")]
+[assembly: AssemblyVersion("2.0.0.7486")]
+[assembly: AssemblyFileVersion("2.0.0.7486")]
+[assembly: AssemblyInformationalVersion("2.0.0.7486")]

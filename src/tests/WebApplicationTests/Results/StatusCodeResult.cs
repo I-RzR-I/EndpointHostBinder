@@ -17,6 +17,7 @@
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebApplicationTests.Results
@@ -31,7 +32,7 @@ namespace WebApplicationTests.Results
         public StatusCodeResult(int statusCode)
             => StatusCode = statusCode;
 
-        public Task ExecuteAsync(HttpContext context)
+        public Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default)
         {
             context.Response.StatusCode = StatusCode;
 

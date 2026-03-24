@@ -4,10 +4,16 @@
 |----------|----------|
 | EndpointHostBinder | [![NuGet Version](https://img.shields.io/nuget/v/EndpointHostBinder.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/EndpointHostBinder/) [![Nuget Downloads](https://img.shields.io/nuget/dt/EndpointHostBinder.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/EndpointHostBinder)|
 
-A middleware that listens to application requests and validates them, allows them to be processed by `IEndpointHostRequestHandler` and `IEndpointHostResult`. Allow to expose application endpoint, without any (bypassing) controllers.
+A middleware that listens to application requests and validates them, allows them to be processed by `IEndpointHostRequestHandler` and `IEndpointHostResult`. Exposes application endpoints without using controllers.
 
+Key features:
+- Route incoming HTTP requests to lightweight handler classes — no controllers required.
+- Register endpoints **manually** via `AddHostEndpoint<T>()` with full control over name, path, active state, and HTTP method constraints.
+- Register endpoints **automatically** via `AddHostEndpointsFromAssembly()` by decorating handlers with `[EndpointHost]`.
+- Mix both approaches safely — duplicate registrations are detected and skipped.
+- Pre-compiled LINQ expression tree executors eliminate per-request reflection overhead.
 
-To understand more efficiently how you can use available functionalities please consult the [using documentation/file](docs/usage.md).
+To understand more efficiently how you can use available functionalities please consult the [usage documentation](docs/usage.md).
 
 **In case you wish to use it in your project, u can install the package from <a href="https://www.nuget.org/packages/EndpointHostBinder" target="_blank">nuget.org</a>** or specify what version you want:
 

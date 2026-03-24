@@ -1,35 +1,41 @@
 ﻿// ***********************************************************************
 //  Assembly         : RzR.Shared.Services.EndpointTests
 //  Author           : RzR
-//  Created On       : 2024-04-19 22:23
+//  Created On       : 2026-03-18 20:03
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-04-19 22:23
+//  Last Modified On : 2026-03-18 20:19
 // ***********************************************************************
-//  <copyright file="EndpointOneHandler.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  <copyright file="FunctionalEndpointHandler.cs" company="RzR SOFT & TECH">
+//   Copyright © RzR. All rights reserved.
 //  </copyright>
 // 
 //  <summary>
 //  </summary>
 // ***********************************************************************
 
+#region U S A G E S
+
 using EndpointHostBinder.Abstractions;
+using EndpointTests.Results;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
+#endregion
+
 namespace EndpointTests.Handlers
 {
-    public class EndpointOneHandler : IEndpointHostRequestHandler
+    public class FunctionalEndpointHandler : IEndpointHostRequestHandler
     {
         /// <inheritdoc />
-        public async Task<IEndpointHostResult> RequestProcessAsync(HttpContext context, 
+        public Task<IEndpointHostResult> RequestProcessAsync(
+            HttpContext context,
             CancellationToken cancellationToken = default)
-            => throw new System.NotImplementedException();
-        
+            => Task.FromResult<IEndpointHostResult>(new FunctionalEndpointResult());
+
         /// <inheritdoc />
         public IEndpointHostResult RequestProcess(HttpContext context)
-            => throw new System.NotImplementedException();
+            => new FunctionalEndpointResult();
     }
 }

@@ -17,7 +17,7 @@
 #region U S A G E S
 
 using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
+using DomainCommonExtensions.Utilities.Ensure;
 using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -30,7 +30,10 @@ namespace EndpointHostBinder.Host
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     An endpoint host binder middleware.
+    ///     Core middleware that intercepts incoming HTTP requests, matches them against
+    ///     registered endpoints via <see cref="IEndpointHostRouter"/>, and dispatches execution to
+    ///     the matching endpoint's <see cref="ICompiledEndpointExecutor"/>. Requests that do not
+    ///     match any active endpoint are forwarded to the next middleware in the pipeline.
     /// </summary>
     /// =================================================================================================
     public class EndpointHostBinderMiddleware
@@ -53,47 +56,57 @@ namespace EndpointHostBinder.Host
         /// <summary>
         ///     Initializes a new instance of the <see cref="EndpointHostBinderMiddleware" /> class.
         /// </summary>
-        /// <param name="next">The next.</param>
-        /// <param name="logger">The logger.</param>
+        /// <param name="next">The next middleware delegate in the request pipeline.</param>
+        /// <param name="logger">The logger used to record diagnostic and warning messages.</param>
         /// =================================================================================================
         public EndpointHostBinderMiddleware(RequestDelegate next, ILogger<EndpointHostBinderMiddleware> logger)
         {
             _next = next;
             _logger = logger;
         }
-
+        
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Executes the given operation on a different thread, and waits for the result.
+        ///     Processes the incoming HTTP request. If the router finds a matching active endpoint the
+        ///     request is dispatched to its compiled executor; otherwise the request is forwarded to
+        ///     the next middleware in the pipeline. Any unhandled exception is logged at the critical
+        ///     level and re-thrown.
         /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="router">The router.</param>
+        /// <param name="context">The current HTTP context for the request being processed.</param>
+        /// <param name="router">
+        ///     The <see cref="IEndpointHostRouter"/> used to locate a matching endpoint.
+        /// </param>
         /// <returns>
-        ///     A Task.
+        ///     A <see cref="Task"/> that completes when the request has been handled or forwarded.
         /// </returns>
         /// =================================================================================================
-        public async Task Invoke(HttpContext context, IEndpointHostRouter router)
+        public async Task InvokeAsync(HttpContext context, IEndpointHostRouter router)
         {
             context.ThrowIfArgNull(nameof(context));
             router.ThrowIfArgNull(nameof(router));
 
             try
             {
-                var endpoint = router.Find(context);
-                if (endpoint.IsNotNull())
+                if (await router.ExistAsync(context).ConfigureAwait(false) == false)
                 {
-                    _logger.LogInformation("Invoking endpoint: {endpointType} for {url}", endpoint.GetType().FullName, context.Request.Path.ToString());
-
-                    var result = await endpoint.RequestProcessAsync(context);
-
-                    if (result.IsNotNull())
-                    {
-                        _logger.LogTrace("Invoking result: {type}", result.GetType().FullName);
-                        await result.ExecuteAsync(context);
-                    }
+                    await _next(context).ConfigureAwait(false);
 
                     return;
                 }
+
+                var endpoint = router.Find(context);
+                if (endpoint.IsNull() || endpoint.Executor.IsNull())
+                {
+                    _logger.LogWarning("Endpoint [{path}] has no compiled executor", context.Request.Path);
+                    await _next(context).ConfigureAwait(false);
+
+                    return;
+                }
+
+                _logger.LogDebug("Executing endpoint [{name}] for path [{path}]", endpoint.Name, endpoint.Path);
+                await endpoint.Executor.ExecuteAsync(context).ConfigureAwait(false);
+                
+                return;
             }
             catch (Exception ex)
             {
@@ -101,8 +114,6 @@ namespace EndpointHostBinder.Host
 
                 throw;
             }
-
-            await _next(context);
         }
     }
 }

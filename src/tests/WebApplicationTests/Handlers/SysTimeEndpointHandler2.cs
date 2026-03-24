@@ -16,22 +16,25 @@
 
 using DomainCommonExtensions.DataTypeExtensions;
 using EndpointHostBinder.Abstractions;
+using EndpointHostBinder.Attributes;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using WebApplicationTests.Results;
 
 namespace WebApplicationTests.Handlers
 {
-    public class SysTimeEndpointHandler : IEndpointHostRequestHandler
+    [EndpointHost("sysTime2", "/systime2", true, new[] { "GET" })]
+    public class SysTimeEndpointHandler2 : IEndpointHostRequestHandler
     {
         /// <inheritdoc />
         public Task<IEndpointHostResult> RequestProcessAsync(HttpContext context, CancellationToken cancellationToken = default)
         {
             IEndpointHostResult result = HttpMethods.IsGet(context.Request.Method).IsFalse()
                 ? new StatusCodeResult(HttpStatusCode.MethodNotAllowed)
-                : new SysTimeEndpointResult();
+                : new SysTimeEndpointResult2();
 
             return Task.FromResult(result);
         }
@@ -40,9 +43,9 @@ namespace WebApplicationTests.Handlers
         public IEndpointHostResult RequestProcess(HttpContext context)
         {
             IEndpointHostResult result;
-            result = HttpMethods.IsGet(context.Request.Method).IsFalse() 
-                ? new StatusCodeResult(HttpStatusCode.MethodNotAllowed) 
-                : new SysTimeEndpointResult();
+            result = HttpMethods.IsGet(context.Request.Method).IsFalse()
+                ? new StatusCodeResult(HttpStatusCode.MethodNotAllowed)
+                : new SysTimeEndpointResult2();
 
             return result;
         }

@@ -16,7 +16,10 @@
 
 #region U S A G E S
 
+using DomainCommonExtensions.ArraysExtensions;
+using DomainCommonExtensions.CommonExtensions;
 using DomainCommonExtensions.DataTypeExtensions;
+using DomainCommonExtensions.Utilities.Ensure;
 using EndpointHostBinder.Abstractions;
 using EndpointHostBinder.Models;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +27,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 #endregion
@@ -32,7 +36,9 @@ namespace EndpointHostBinder.Host
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     An endpoint host router.
+    ///     Routes incoming HTTP requests to the matching registered <see cref="Endpoint"/> by
+    ///     comparing the request path and HTTP method against the collection of endpoints provided
+    ///     at construction time.
     /// </summary>
     /// <seealso cref="T:EndpointHostBinder.Abstractions.IEndpointHostRouter" />
     /// =================================================================================================
@@ -56,8 +62,10 @@ namespace EndpointHostBinder.Host
         /// <summary>
         ///     Initializes a new instance of the <see cref="EndpointHostRouter" /> class.
         /// </summary>
-        /// <param name="endpoints">The endpoints.</param>
-        /// <param name="logger">The logger.</param>
+        /// <param name="endpoints">
+        ///     The collection of registered <see cref="Endpoint"/> instances to route against.
+        /// </param>
+        /// <param name="logger">The logger used to record diagnostic and warning messages.</param>
         /// =================================================================================================
         public EndpointHostRouter(IEnumerable<Endpoint> endpoints, ILogger<EndpointHostRouter> logger)
         {
@@ -66,48 +74,53 @@ namespace EndpointHostBinder.Host
         }
 
         /// <inheritdoc />
-        public IEndpointHostRequestHandler Find(HttpContext context)
+        public Endpoint Find(HttpContext context)
         {
             context.ThrowIfArgNull(nameof(context));
 
-            if (Exist(context).IsFalse())
+            var endpoint = _endpoints.FirstOrDefault(x =>
+                x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase) &&
+                (x.AllowedMethods.IsNullOrEmptyEnumerable() ||
+                 x.AllowedMethods.Any(m => m == new HttpMethod(context.Request.Method))));
+
+            if (endpoint.IsNull())
             {
                 _logger.LogDebug("Request path [{path}] no match any endpoints", context.Request.Path);
 
                 return null;
             }
 
-            var endpoint = _endpoints.FirstOrDefault(x => x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase));
-            _logger.LogDebug("Request path [{path}] matched to endpoint type [{endpoint}]", context.Request.Path, endpoint!.Name);
+            _logger.LogDebug("Request path [{path}] matched endpoint [{endpoint}]", context.Request.Path, endpoint!.Name);
 
-            if (endpoint.IsActive.IsTrue())
+            if (endpoint.IsActive.IsFalse())
             {
-                var handler = context.RequestServices.GetService(endpoint.EndpointType);
-                if (handler is IEndpointHostRequestHandler hostHandler)
-                {
-                    _logger.LogDebug("Endpoint enabled: [{endpoint}], successfully created handler: [{endpointHandler}]", endpoint.Name, endpoint.EndpointType.FullName);
+                _logger.LogWarning("Endpoint disabled: [{endpoint}]", endpoint.Name);
 
-                    return hostHandler;
-                }
-
-                _logger.LogDebug("Endpoint enabled: [{endpoint}], failed to create handler: [{endpointHandler}]", endpoint.Name, endpoint.EndpointType.FullName);
+                return null;
             }
 
-            _logger.LogWarning("Endpoint disabled: [{endpoint}]", endpoint.Name);
+            _logger.LogDebug("Endpoint enabled: [{endpoint}], successfully find handler: [{endpointHandler}]", endpoint.Name, endpoint.EndpointType.FullName);
 
-            return null;
+            return endpoint;
         }
 
         /// <inheritdoc />
         public bool Exist(HttpContext context)
         {
             context.ThrowIfArgNull(nameof(context));
-
-            return _endpoints.Any(x => x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase));
+            return _endpoints.Any(x =>
+                x.IsActive &&
+                x.Path.Equals(context.Request.Path, StringComparison.OrdinalIgnoreCase) &&
+                (x.AllowedMethods.IsNullOrEmptyEnumerable() ||
+                 x.AllowedMethods.Any(m => m == new HttpMethod(context.Request.Method))));
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExistAsync(HttpContext context)
-            => await Task.Run(() => Exist(context));
+        public Task<bool> ExistAsync(HttpContext context)
+        {
+            context.ThrowIfArgNull(nameof(context));
+
+            return Task.FromResult(Exist(context));
+        }
     }
 }

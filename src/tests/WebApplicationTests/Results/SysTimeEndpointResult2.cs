@@ -22,17 +22,21 @@ using System.Threading.Tasks;
 
 namespace WebApplicationTests.Results
 {
-    public class SysTimeEndpointResult : IEndpointHostResult
+    public class SysTimeEndpointResult2 : IEndpointHostResult
     {
         /// <inheritdoc />
-        public Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default)
+        public async Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default)
         {
-            Execute(context);
 
-            return Task.CompletedTask;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync(DateTime.UtcNow.ToString("O"), cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public void Execute(HttpContext context) => context.Response.WriteAsync($"{DateTime.Now}");
+        public void Execute(HttpContext context)
+        {
+            context.Response.ContentType = "text/plain";
+            context.Response.WriteAsync(DateTime.UtcNow.ToString("O")).GetAwaiter().GetResult();
+        }
     }
 }

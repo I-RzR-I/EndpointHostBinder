@@ -16,8 +16,8 @@
 
 #region U S A G E S
 
-using EndpointHostBinder;
 using EndpointHostBinder.Abstractions;
+using EndpointHostBinder.Discovery;
 using EndpointHostBinder.Host;
 using EndpointHostBinder.Models;
 using EndpointTests.Common;
@@ -29,6 +29,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ namespace EndpointTests
                 true,
                 true);
 
-            await middleware.Invoke(ctx, router);
+            await middleware.InvokeAsync(ctx, router);
 
             Assert.IsFalse(nextWasCalled.Value, "Next middleware should NOT be called when endpoint matches");
             Assert.AreEqual(200, ctx.Response.StatusCode);
@@ -65,7 +66,7 @@ namespace EndpointTests
                 true,
                 true);
 
-            await middleware.Invoke(ctx, router);
+            await middleware.InvokeAsync(ctx, router);
 
             Assert.IsTrue(nextWasCalled.Value, "Next middleware should be called when no endpoint matches");
         }
@@ -78,7 +79,7 @@ namespace EndpointTests
                 true,
                 false); // <-- inactive
 
-            await middleware.Invoke(ctx, router);
+            await middleware.InvokeAsync(ctx, router);
 
             Assert.IsTrue(nextWasCalled.Value, "Next middleware should be called when matched endpoint is disabled");
         }
@@ -89,6 +90,7 @@ namespace EndpointTests
             var services = new ServiceCollection()
                 .AddLogging()
                 .RegisterEndpointHostBuilder()
+                .AddHostEndpointsFromAssembly(Assembly.GetExecutingAssembly())
                 .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", new[] { HttpMethod.Get });
 
             var provider = services.BuildServiceProvider();
@@ -106,7 +108,7 @@ namespace EndpointTests
             var ctx = new DefaultHttpContext { Request = { Path = "/func", Method = "POST" }, RequestServices = provider };
             AttachResponseBody(ctx);
 
-            await middleware.Invoke(ctx, router);
+            await middleware.InvokeAsync(ctx, router);
 
             Assert.IsTrue(nextWasCalled.Value, "POST to GET-only endpoint should fall through to next");
         }
@@ -118,6 +120,7 @@ namespace EndpointTests
             var services = new ServiceCollection()
                 .AddLogging()
                 .RegisterEndpointHostBuilder()
+                .AddHostEndpointsFromAssembly(Assembly.GetExecutingAssembly())
                 .AddHostEndpoint<ThrowingEndpointHandler>("throw", "/throw");
 
             var provider = services.BuildServiceProvider();
@@ -129,7 +132,7 @@ namespace EndpointTests
 
             var ctx = new DefaultHttpContext { Request = { Path = "/throw", Method = "GET" }, RequestServices = provider };
 
-            await middleware.Invoke(ctx, router);
+            await middleware.InvokeAsync(ctx, router);
         }
 
         [TestMethod]
@@ -140,12 +143,12 @@ namespace EndpointTests
 
             var services = new ServiceCollection()
                 .AddLogging()
-                .RegisterEndpointHostBuilder();
+                .RegisterEndpointHostBuilder()
+                .AddHostEndpointsFromAssembly(Assembly.GetExecutingAssembly())
+                .AddHostEndpoint<TokenCapturingHandler>("capture", "/capture");
 
-            // Register a capturing handler directly through the pre-built endpoint overload
-            services.AddTransient(sp => new TokenCapturingHandler(t => receivedToken = t));
-            services.AddSingleton(new Endpoint(
-                "capture", "/capture", typeof(TokenCapturingHandler)));
+            // Override with capturing factory — last registration wins for GetRequiredService<T>
+            services.AddTransient<TokenCapturingHandler>(_ => new TokenCapturingHandler(t => receivedToken = t));
 
             var provider = services.BuildServiceProvider();
             var router = provider.GetRequiredService<IEndpointHostRouter>() as EndpointHostRouter;
@@ -159,7 +162,7 @@ namespace EndpointTests
             ctx.RequestAborted = cts.Token;
             AttachResponseBody(ctx);
 
-            await middleware.Invoke(ctx, router);
+            await middleware.InvokeAsync(ctx, router);
 
             Assert.AreEqual(cts.Token, receivedToken, "RequestAborted CancellationToken should be forwarded to the handler");
         }
@@ -170,6 +173,7 @@ namespace EndpointTests
             var services = new ServiceCollection()
                 .AddLogging()
                 .RegisterEndpointHostBuilder()
+                .AddHostEndpointsFromAssembly(Assembly.GetExecutingAssembly())
                 .AddHostEndpoint<FunctionalEndpointHandler>("func", "/func")
                 .AddHostEndpoint<EndpointOneHandler>("ep1", "/ep1");
 
@@ -190,7 +194,7 @@ namespace EndpointTests
                 var ctx = new DefaultHttpContext { Request = { Path = "/func", Method = "GET" }, RequestServices = provider };
                 AttachResponseBody(ctx);
 
-                await middleware.Invoke(ctx, router);
+                await middleware.InvokeAsync(ctx, router);
 
                 Assert.IsFalse(nextWasCalled.Value, $"Iteration {i}: next should not be called for /func");
                 Assert.AreEqual(200, ctx.Response.StatusCode, $"Iteration {i}: expected 200");
@@ -203,7 +207,9 @@ namespace EndpointTests
             var box = new BoxedBool();
             nextCalled = box;
 
-            var services = new ServiceCollection().AddLogging().RegisterEndpointHostBuilder();
+            var services = new ServiceCollection().AddLogging()
+                .RegisterEndpointHostBuilder()
+                .AddHostEndpointsFromAssembly(Assembly.GetExecutingAssembly());
             if (registerFunctional)
                 services.AddHostEndpoint<FunctionalEndpointHandler>("func", "/func", active);
 

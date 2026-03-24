@@ -72,7 +72,7 @@ namespace EndpointTests
             var result = _endpointHostRouter.Find(ctx);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(typeof(EndpointOneHandler), result.GetType());
+            Assert.AreEqual(typeof(EndpointOneHandler), result.EndpointType);
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace EndpointTests
             var result = _endpointHostRouter.Find(ctx);
 
             Assert.IsNotNull(result);
-            Assert.AreNotEqual(typeof(EndpointTwoHandler), result.GetType());
+            Assert.AreNotEqual(typeof(EndpointTwoHandler), result.EndpointType);
         }
 
         [TestMethod]
@@ -108,7 +108,7 @@ namespace EndpointTests
             var result = _endpointHostRouter.Find(ctx);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(typeof(EndpointTwoHandler), result.GetType());
+            Assert.AreEqual(typeof(EndpointTwoHandler), result.EndpointType);
         }
 
         [TestMethod]
@@ -171,7 +171,7 @@ namespace EndpointTests
             var result = _endpointHostRouter.Find(ctx);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(typeof(EndpointOneHandler), result.GetType());
+            Assert.AreEqual(typeof(EndpointOneHandler), result.EndpointType);
         }
 
         [TestMethod]
@@ -204,7 +204,7 @@ namespace EndpointTests
             var result = _endpointHostRouter.Find(ctx);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(typeof(EndpointOneHandler), result.GetType());
+            Assert.AreEqual(typeof(EndpointOneHandler), result.EndpointType);
         }
 
         [TestMethod]
@@ -296,9 +296,9 @@ namespace EndpointTests
             var postResult = _endpointHostRouter.Find(postCtx);
 
             Assert.IsNotNull(getResult);
-            Assert.AreEqual(typeof(EndpointOneHandler), getResult.GetType());
+            Assert.AreEqual(typeof(EndpointOneHandler), getResult.EndpointType);
             Assert.IsNotNull(postResult);
-            Assert.AreEqual(typeof(EndpointTwoHandler), postResult.GetType());
+            Assert.AreEqual(typeof(EndpointTwoHandler), postResult.EndpointType);
         }
 
         [TestMethod]
@@ -404,7 +404,7 @@ namespace EndpointTests
                 var result = _endpointHostRouter.Find(ctx);
 
                 Assert.IsNotNull(result, $"Expected handler for path {path}");
-                Assert.AreEqual(expected, result.GetType(), $"Wrong handler type for path {path}");
+                Assert.AreEqual(expected, result.EndpointType, $"Wrong handler type for path {path}");
             }
         }
 

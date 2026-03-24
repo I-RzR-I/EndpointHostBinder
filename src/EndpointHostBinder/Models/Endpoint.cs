@@ -86,14 +86,13 @@ namespace EndpointHostBinder.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Endpoint" /> class.
+        ///     Gets the executor.
         /// </summary>
-        /// <param name="name">The endpoint name.</param>
-        /// <param name="path">Full pathname of the resource.</param>
-        /// <param name="type">The handler type.</param>
+        /// <value>
+        ///     The executor.
+        /// </value>
         /// =================================================================================================
-        public Endpoint(string name, PathString path, Type type)
-            : this(name, path, type, true, null) { }
+        public ICompiledEndpointExecutor Executor { get; private set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -109,33 +108,47 @@ namespace EndpointHostBinder.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method constraints.
+        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method
+        ///     constraints.
         /// </summary>
         /// <param name="name">The endpoint name.</param>
         /// <param name="path">Full pathname of the resource.</param>
         /// <param name="type">The handler type.</param>
-        /// <param name="allowedMethods">Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>). Pass null or empty to allow all methods.</param>
+        /// <param name="allowedMethods">
+        ///     Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>).
+        ///     Pass null or empty to allow all methods.
+        /// </param>
         /// =================================================================================================
         public Endpoint(string name, PathString path, Type type, HttpMethod[] allowedMethods)
             : this(name, path, type, true, allowedMethods) { }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method constraints.
+        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method
+        ///     constraints.
         /// </summary>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when one or more arguments have unsupported or illegal values.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown when one or more required arguments are null.
+        /// </exception>
         /// <param name="name">The endpoint name.</param>
         /// <param name="path">Full pathname of the resource.</param>
         /// <param name="type">The handler type.</param>
         /// <param name="isActive">True if the endpoint is active, false if not.</param>
-        /// <param name="allowedMethods">Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>). Pass null or empty to allow all methods.</param>
+        /// <param name="allowedMethods">
+        ///     Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>).
+        ///     Pass null or empty to allow all methods.
+        /// </param>
         /// =================================================================================================
-        public Endpoint(string name, PathString path, Type type, bool isActive, HttpMethod[] allowedMethods)
+        public Endpoint(string name, PathString path, Type type, bool isActive = true, HttpMethod[] allowedMethods = null)
         {
             if (name.IsMissing())
                 throw new ArgumentException("Endpoint name cannot be null, empty, or whitespace.", nameof(name));
             if (type.IsNull())
                 throw new ArgumentNullException(nameof(type));
-            if (!typeof(IEndpointHostRequestHandler).IsAssignableFrom(type))
+            if (typeof(IEndpointHostRequestHandler).IsAssignableFrom(type).IsFalse())
                 throw new ArgumentException($"Type '{type.Name}' must implement {nameof(IEndpointHostRequestHandler)}.", nameof(type));
 
             Name = name;
@@ -146,5 +159,55 @@ namespace EndpointHostBinder.Models
                 ? allowedMethods
                 : null;
         }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Endpoint" /> class with HTTP method
+        ///     constraints.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when one or more arguments have unsupported or illegal values.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown when one or more required arguments are null.
+        /// </exception>
+        /// <param name="name">The endpoint name.</param>
+        /// <param name="path">Full pathname of the resource.</param>
+        /// <param name="type">The handler type.</param>
+        /// <param name="isActive">True if the endpoint is active, false if not.</param>
+        /// <param name="allowedMethods">
+        ///     Allowed HTTP methods (e.g. <see cref="HttpMethod.Get"/>, <see cref="HttpMethod.Post"/>).
+        ///     Pass null or empty to allow all methods.
+        /// </param>
+        /// <param name="executor">The executor.</param>
+        /// =================================================================================================
+        public Endpoint(string name, PathString path, Type type, bool isActive, HttpMethod[] allowedMethods,
+            ICompiledEndpointExecutor executor)
+        {
+            if (name.IsMissing())
+                throw new ArgumentException("Endpoint name cannot be null, empty, or whitespace.", nameof(name));
+            if (type.IsNull())
+                throw new ArgumentNullException(nameof(type));
+            if (typeof(IEndpointHostRequestHandler).IsAssignableFrom(type).IsFalse())
+                throw new ArgumentException($"Type '{type.Name}' must implement {nameof(IEndpointHostRequestHandler)}.", nameof(type));
+
+            Name = name;
+            Path = path;
+            EndpointType = type;
+            IsActive = isActive;
+            Executor = executor;
+            AllowedMethods = allowedMethods.IsNotNullOrEmptyEnumerable()
+                ? allowedMethods
+                : null;
+        }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Sets an executor.
+        /// </summary>
+        /// <param name="executor">The executor.</param>
+        /// =================================================================================================
+        public void SetExecutor(ICompiledEndpointExecutor executor)
+            => Executor = executor;
     }
 }

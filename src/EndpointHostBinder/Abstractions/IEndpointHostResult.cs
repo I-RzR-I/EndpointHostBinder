@@ -26,30 +26,31 @@ namespace EndpointHostBinder.Abstractions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Interface for endpoint host result.
+    ///     Represents the result produced by an <see cref="IEndpointHostRequestHandler"/>, responsible
+    ///     for writing the final HTTP response (status code, headers, body) to the current context.
     /// </summary>
     /// =================================================================================================
     public interface IEndpointHostResult
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Executes the 'asynchronous' operation.
+        ///     Asynchronously writes the endpoint result to the HTTP response.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="context">The current HTTP context whose response will be populated.</param>
         /// <param name="cancellationToken">
         ///     (Optional) A token that allows processing to be cancelled.
         /// </param>
         /// <returns>
-        ///     A Task.
+        ///     A <see cref="Task"/> that completes when the response has been written.
         /// </returns>
         /// =================================================================================================
         Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Executes the given context.
+        ///     Synchronously writes the endpoint result to the HTTP response.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="context">The current HTTP context whose response will be populated.</param>
         /// =================================================================================================
         void Execute(HttpContext context);
     }

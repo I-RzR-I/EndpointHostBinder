@@ -22,7 +22,6 @@
 		<LangVersion>latest</LangVersion>
 		<Language>en-US</Language>
 		<RepositoryType>GIT</RepositoryType>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIconUrl />
 	</PropertyGroup>
 

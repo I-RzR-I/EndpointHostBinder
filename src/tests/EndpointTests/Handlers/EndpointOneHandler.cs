@@ -14,8 +14,8 @@
 //  </summary>
 // ***********************************************************************
 
-using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -1,25 +1,25 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 //  Assembly         : RzR.Shared.Services.EndpointTests
 //  Author           : RzR
 //  Created On       : 2026-03-18 20:03
-// 
+//
 //  Last Modified By : RzR
 //  Last Modified On : 2026-03-18 20:32
 // ***********************************************************************
 //  <copyright file="EndpointModelTests.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
 //  </copyright>
-// 
+//
 //  <summary>
 //  </summary>
 // ***********************************************************************
 
 #region U S A G E S
 
-using EndpointHostBinder.Models;
 using EndpointTests.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RzR.Infrastructure.EndpointHosting.Models;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -123,10 +123,6 @@ namespace EndpointTests
             var ep = new Endpoint("ep", "/path", typeof(EndpointOneHandlerDerived));
 
             Assert.AreEqual(typeof(EndpointOneHandlerDerived), ep.EndpointType);
-        }
-
-        private class EndpointOneHandlerDerived : EndpointOneHandler
-        {
         }
     }
 }

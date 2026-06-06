@@ -16,8 +16,8 @@
 
 #region U S A G E S
 
-using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;

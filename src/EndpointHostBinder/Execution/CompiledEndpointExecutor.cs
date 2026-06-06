@@ -16,22 +16,22 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.CommonExtensions;
-using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 #endregion
 
-namespace EndpointHostBinder.Execution
+namespace RzR.Infrastructure.EndpointHosting.Execution
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A compiled endpoint executor. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="T:EndpointHostBinder.Abstractions.ICompiledEndpointExecutor"/>
+    /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.ICompiledEndpointExecutor"/>
     /// =================================================================================================
     internal sealed class CompiledEndpointExecutor : ICompiledEndpointExecutor
     {
@@ -74,19 +74,43 @@ namespace EndpointHostBinder.Execution
         /// <inheritdoc/>
         public async Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default)
         {
-            var result = await _executorTask(context, context.RequestServices).ConfigureAwait(false);
+            if (_executorTask.IsNotNull())
+            {
+                var result = await _executorTask(context, context.RequestServices).ConfigureAwait(false);
 
-            if (result.IsNotNull())
-                await result.ExecuteAsync(context, cancellationToken).ConfigureAwait(false);
+                if (result.IsNotNull())
+                    await result.ExecuteAsync(context, cancellationToken).ConfigureAwait(false);
+
+                return;
+            }
+
+            if (_executor.IsNotNull())
+            {
+                var result = _executor(context, context.RequestServices);
+
+                if (result.IsNotNull())
+                    result.Execute(context);
+
+                return;
+            }
         }
 
         /// <inheritdoc/>
         public void Execute(HttpContext context)
         {
-            var result = _executor(context, context.RequestServices);
+            if (_executor.IsNotNull())
+            {
+                var result = _executor(context, context.RequestServices);
 
-            if (result.IsNotNull())
-                result.Execute(context);
+                if (result.IsNotNull())
+                    result.Execute(context);
+
+                return;
+            }
+
+            if (_executorTask.IsNotNull())
+                throw new InvalidOperationException(
+                    "This executor was built for asynchronous execution. Use ExecuteAsync instead of Execute.");
         }
     }
 }

@@ -16,18 +16,19 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.ArraysExtensions;
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
-using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
+using RzR.Extensions.Domain.Collections;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Text;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 
 #endregion
 
-namespace EndpointHostBinder.Models
+namespace RzR.Infrastructure.EndpointHosting.Models
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -84,6 +85,8 @@ namespace EndpointHostBinder.Models
         /// =================================================================================================
         public IEnumerable<HttpMethod> AllowedMethods { get; private set; }
 
+        private ICompiledEndpointExecutor _executor;
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the executor.
@@ -92,7 +95,7 @@ namespace EndpointHostBinder.Models
         ///     The executor.
         /// </value>
         /// =================================================================================================
-        public ICompiledEndpointExecutor Executor { get; private set; }
+        public ICompiledEndpointExecutor Executor => _executor;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -195,7 +198,7 @@ namespace EndpointHostBinder.Models
             Path = path;
             EndpointType = type;
             IsActive = isActive;
-            Executor = executor;
+            _executor = executor;
             AllowedMethods = allowedMethods.IsNotNullOrEmptyEnumerable()
                 ? allowedMethods
                 : null;
@@ -203,11 +206,23 @@ namespace EndpointHostBinder.Models
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Sets an executor.
+        ///     Sets the executor for this endpoint using an atomic compare-and-swap that succeeds
+        ///     exactly once. The operation is safe against concurrent callers: the first caller whose
+        ///     compare-and-swap wins assigns the executor; all subsequent callers — whether sequential
+        ///     or concurrent — receive an <see cref="InvalidOperationException" />.
         /// </summary>
-        /// <param name="executor">The executor.</param>
+        /// <param name="executor">The compiled executor to assign.</param>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when <see cref="Executor"/> is already non-null.
+        /// </exception>
         /// =================================================================================================
         public void SetExecutor(ICompiledEndpointExecutor executor)
-            => Executor = executor;
+        {
+            var prior = Interlocked.CompareExchange(ref _executor, executor, null);
+            if (prior.IsNotNull())
+                throw new InvalidOperationException(
+                    $"Executor for endpoint '{Name}' has already been set and cannot be replaced. " +
+                    "Assign the executor once, either via the constructor or a single SetExecutor call.");
+        }
     }
 }

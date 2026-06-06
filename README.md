@@ -2,7 +2,7 @@
 
 | Name     | Details |
 |----------|----------|
-| RzR.Infrastructure.EndpointHosting | [![NuGet Version](https://img.shields.io/nuget/v/RzR.Infrastructure.EndpointHosting.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/EndpointHostBinder/) [![Nuget Downloads](https://img.shields.io/nuget/dt/RzR.Infrastructure.EndpointHosting.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/RzR.Infrastructure.EndpointHosting)|
+| RzR.Infrastructure.EndpointHosting | [![NuGet Version](https://img.shields.io/nuget/v/RzR.Infrastructure.EndpointHosting.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/RzR.Infrastructure.EndpointHosting/) [![Nuget Downloads](https://img.shields.io/nuget/dt/RzR.Infrastructure.EndpointHosting.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/RzR.Infrastructure.EndpointHosting)|
 
 
 <details>

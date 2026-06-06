@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<Authors>RzR</Authors>
 		<Copyright>RzR</Copyright>
@@ -9,7 +9,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageIcon>PackageIcon.png</PackageIcon>
 		<NoWarn>$(NoWarn);CS8032</NoWarn>
-		<EnableNETAnalyzers>false</EnableNETAnalyzers>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<PackageTags>Endpoint;Host;Bind;Resource;API;Middleware</PackageTags>
 		<RepositoryUrl>https://github.com/I-RzR-I/EndpointHostBinder</RepositoryUrl>
@@ -23,6 +23,17 @@
 		<Language>en-US</Language>
 		<RepositoryType>GIT</RepositoryType>
 		<PackageIconUrl />
+
+		<RootNamespace>RzR.Infrastructure.EndpointHosting</RootNamespace>
+		<AssemblyName>RzR.Infrastructure.EndpointHosting</AssemblyName>
+		<!-- Suppress EOL warnings for net5.0 and net7.0: these TFMs are intentionally
+		     included to support consumers who have not yet migrated off out-of-support runtimes. -->
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+		<!-- IsTrimmable and IsAotCompatible are intentionally NOT set to true.
+		     The library uses LINQ expression-tree compilation and Assembly.GetTypes()
+		     reflection that are not fully trim/AOT-safe. Relevant members are annotated
+		     with [RequiresUnreferencedCode], [RequiresDynamicCode], and
+		     [DynamicallyAccessedMembers] on NET5_0_OR_GREATER TFMs only. -->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -49,10 +60,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DomainCommonExtensions" Version="4.6.0.8232" />
+		<PackageReference Include="RzR.Extensions.Domain" Version="6.0.0.8301" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.32" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.32" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.32" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+		<PackageReference Include="System.Text.Json" Version="6.0.10" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.1" />
 	</ItemGroup>
 </Project>

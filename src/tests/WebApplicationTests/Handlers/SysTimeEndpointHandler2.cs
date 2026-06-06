@@ -14,12 +14,11 @@
 //  </summary>
 // ***********************************************************************
 
-using DomainCommonExtensions.DataTypeExtensions;
-using EndpointHostBinder.Abstractions;
-using EndpointHostBinder.Attributes;
 using Microsoft.AspNetCore.Http;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
+using RzR.Infrastructure.EndpointHosting.Attributes;
 using System.Net;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using WebApplicationTests.Results;

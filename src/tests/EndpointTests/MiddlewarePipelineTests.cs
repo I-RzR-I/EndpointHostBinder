@@ -1,31 +1,32 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 //  Assembly         : RzR.Shared.Services.EndpointTests
 //  Author           : RzR
 //  Created On       : 2026-03-18 20:03
-// 
+//
 //  Last Modified By : RzR
 //  Last Modified On : 2026-03-18 20:32
 // ***********************************************************************
 //  <copyright file="MiddlewarePipelineTests.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
 //  </copyright>
-// 
+//
 //  <summary>
 //  </summary>
 // ***********************************************************************
 
 #region U S A G E S
 
-using EndpointHostBinder.Abstractions;
-using EndpointHostBinder.Discovery;
-using EndpointHostBinder.Host;
-using EndpointHostBinder.Models;
-using EndpointTests.Common;
 using EndpointTests.Handlers;
+using EndpointTests.Helpers;
 using EndpointTests.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
+using RzR.Infrastructure.EndpointHosting.Configuration;
+using RzR.Infrastructure.EndpointHosting.Discovery;
+using RzR.Infrastructure.EndpointHosting.Host;
+using RzR.Infrastructure.EndpointHosting.Models;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -103,7 +104,8 @@ namespace EndpointTests
                     nextWasCalled.Value = true;
                     return Task.CompletedTask;
                 },
-                MockLogger.Create<EndpointHostBinderMiddleware>());
+                MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions());
 
             var ctx = new DefaultHttpContext { Request = { Path = "/func", Method = "POST" }, RequestServices = provider };
             AttachResponseBody(ctx);
@@ -128,7 +130,8 @@ namespace EndpointTests
 
             var middleware = new EndpointHostBinderMiddleware(
                 _ => Task.CompletedTask,
-                MockLogger.Create<EndpointHostBinderMiddleware>());
+                MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions());
 
             var ctx = new DefaultHttpContext { Request = { Path = "/throw", Method = "GET" }, RequestServices = provider };
 
@@ -155,7 +158,8 @@ namespace EndpointTests
 
             var middleware = new EndpointHostBinderMiddleware(
                 _ => Task.CompletedTask,
-                MockLogger.Create<EndpointHostBinderMiddleware>());
+                MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions());
 
             var ctx = new DefaultHttpContext { Request = { Path = "/capture", Method = "GET" }, RequestServices = provider };
             // assign RequestAborted to our source's token
@@ -189,7 +193,8 @@ namespace EndpointTests
                         nextWasCalled.Value = true;
                         return Task.CompletedTask;
                     },
-                    MockLogger.Create<EndpointHostBinderMiddleware>());
+                    MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions());
 
                 var ctx = new DefaultHttpContext { Request = { Path = "/func", Method = "GET" }, RequestServices = provider };
                 AttachResponseBody(ctx);
@@ -199,6 +204,64 @@ namespace EndpointTests
                 Assert.IsFalse(nextWasCalled.Value, $"Iteration {i}: next should not be called for /func");
                 Assert.AreEqual(200, ctx.Response.StatusCode, $"Iteration {i}: expected 200");
             }
+        }
+
+        [TestMethod]
+        public async Task Invoke_NoExecutor_PassThroughTrue_CallsNextMiddleware_Test()
+        {
+            // Endpoint matches the path but has a null executor; default options pass through to next.
+            var router = BuildNullExecutorRouter();
+            var nextWasCalled = new BoxedBool();
+            var middleware = new EndpointHostBinderMiddleware(
+                _ =>
+                {
+                    nextWasCalled.Value = true;
+                    return Task.CompletedTask;
+                },
+                MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions { PassThroughOnNoExecutor = true });
+
+            var ctx = new DefaultHttpContext { Request = { Path = "/noexec", Method = "GET" } };
+            AttachResponseBody(ctx);
+
+            await middleware.InvokeAsync(ctx, router);
+
+            Assert.IsTrue(nextWasCalled.Value, "PassThroughOnNoExecutor=true should forward to next when executor is null");
+        }
+
+        [TestMethod]
+        public async Task Invoke_NoExecutor_PassThroughFalse_ShortCircuitsWith500_Test()
+        {
+            // Endpoint matches the path but has a null executor; options short-circuit with a 500.
+            var router = BuildNullExecutorRouter();
+            var nextWasCalled = new BoxedBool();
+            var middleware = new EndpointHostBinderMiddleware(
+                _ =>
+                {
+                    nextWasCalled.Value = true;
+                    return Task.CompletedTask;
+                },
+                MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions { PassThroughOnNoExecutor = false });
+
+            var ctx = new DefaultHttpContext { Request = { Path = "/noexec", Method = "GET" } };
+            AttachResponseBody(ctx);
+
+            await middleware.InvokeAsync(ctx, router);
+
+            Assert.IsFalse(nextWasCalled.Value, "PassThroughOnNoExecutor=false should NOT forward to next");
+            Assert.AreEqual(500, ctx.Response.StatusCode, "PassThroughOnNoExecutor=false should short-circuit with 500");
+        }
+
+        private static EndpointHostRouter BuildNullExecutorRouter()
+        {
+            // 4-arg ctor leaves Executor null while keeping the endpoint active and matchable.
+            var endpoint = new Endpoint("noexec", "/noexec", typeof(FunctionalEndpointHandler), true);
+
+            return new EndpointHostRouter(
+                new[] { endpoint },
+                MockLogger.Create<EndpointHostRouter>(),
+                new EndpointHostOptions());
         }
 
         private static (EndpointHostBinderMiddleware middleware, EndpointHostRouter router, DefaultHttpContext ctx)
@@ -222,7 +285,8 @@ namespace EndpointTests
                     box.Value = true;
                     return Task.CompletedTask;
                 },
-                MockLogger.Create<EndpointHostBinderMiddleware>());
+                MockLogger.Create<EndpointHostBinderMiddleware>(),
+                new EndpointHostOptions());
 
             var ctx = new DefaultHttpContext { Request = { Path = path, Method = method }, RequestServices = provider };
             AttachResponseBody(ctx);
@@ -237,40 +301,6 @@ namespace EndpointTests
         {
             ctx.Response.Body.Seek(0, SeekOrigin.Begin);
             return new StreamReader(ctx.Response.Body, Encoding.UTF8).ReadToEnd();
-        }
-
-        private class BoxedBool
-        {
-            public bool Value { get; set; }
-        }
-
-        // Handler that records the CancellationToken it receives
-        private class TokenCapturingHandler : IEndpointHostRequestHandler
-        {
-            private readonly Action<CancellationToken> _capture;
-
-            public TokenCapturingHandler(Action<CancellationToken> capture) => _capture = capture;
-
-            public Task<IEndpointHostResult> RequestProcessAsync(
-                HttpContext context, CancellationToken cancellationToken = default)
-            {
-                _capture(cancellationToken);
-                return Task.FromResult<IEndpointHostResult>(new FunctionalEndpointResult());
-            }
-
-            public IEndpointHostResult RequestProcess(HttpContext context)
-                => new FunctionalEndpointResult();
-        }
-
-        // Handler that always throws — used to verify exception propagation
-        private class ThrowingEndpointHandler : IEndpointHostRequestHandler
-        {
-            public Task<IEndpointHostResult> RequestProcessAsync(
-                HttpContext context, CancellationToken cancellationToken = default)
-                => throw new InvalidOperationException("Handler failure");
-
-            public IEndpointHostResult RequestProcess(HttpContext context)
-                => throw new InvalidOperationException("Handler failure");
         }
     }
 }

@@ -16,13 +16,14 @@
 
 #region U S A G E S
 
-using EndpointHostBinder.Models;
 using Microsoft.AspNetCore.Http;
+using RzR.Infrastructure.EndpointHosting.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 #endregion
 
-namespace EndpointHostBinder.Abstractions
+namespace RzR.Infrastructure.EndpointHosting.Abstractions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -72,5 +73,17 @@ namespace EndpointHostBinder.Abstractions
         /// </returns>
         /// =================================================================================================
         Task<bool> ExistAsync(HttpContext context);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Returns a read-only snapshot of all <see cref="Endpoint"/> instances registered with
+        ///     this router, regardless of their active state. The collection is fixed at construction
+        ///     time and never mutated after that.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection containing every registered <see cref="Endpoint"/>.
+        /// </returns>
+        /// =================================================================================================
+        IReadOnlyCollection<Endpoint> GetEndpoints();
     }
 }

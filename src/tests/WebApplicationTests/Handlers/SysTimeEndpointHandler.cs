@@ -14,9 +14,9 @@
 //  </summary>
 // ***********************************************************************
 
-using DomainCommonExtensions.DataTypeExtensions;
-using EndpointHostBinder.Abstractions;
 using Microsoft.AspNetCore.Http;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;

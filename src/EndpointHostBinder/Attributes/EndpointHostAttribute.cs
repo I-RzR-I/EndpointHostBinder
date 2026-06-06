@@ -16,19 +16,19 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.ArraysExtensions;
+using RzR.Extensions.Domain.Collections;
 using System;
 using System.Linq;
 using System.Net.Http;
 
 #endregion
 
-namespace EndpointHostBinder.Attributes
+namespace RzR.Infrastructure.EndpointHosting.Attributes
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Marks a class as an endpoint handler and supplies the routing metadata used by
-    ///     <see cref="Discovery.EndpointDiscoveryExtensions.AddHostEndpointsFromAssembly"/> to
+    ///     <see cref="Discovery.EndpointDiscoveryExtensions.AddHostEndpointsFromAssembly(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Reflection.Assembly)"/> to
     ///     automatically register the handler. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="T:Attribute"/>

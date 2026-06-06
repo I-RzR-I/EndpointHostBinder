@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 #endregion
 
-namespace EndpointHostBinder.Abstractions
+namespace RzR.Infrastructure.EndpointHosting.Abstractions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

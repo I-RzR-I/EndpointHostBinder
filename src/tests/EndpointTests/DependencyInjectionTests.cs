@@ -1,28 +1,29 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.EndpointTests
-//  Author           : RzR
-//  Created On       : 2026-03-18 20:03
+//  Assembly          : RzR.Shared.Services.EndpointTests
+//  Author            : RzR
+//  Created           : 04-06-2026 23:06
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-03-18 20:27
-// ***********************************************************************
+//  Last Modified On : 07-06-2026 01:08
+//  ***********************************************************************
 //  <copyright file="DependencyInjectionTests.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
-using EndpointHostBinder.Abstractions;
-using EndpointHostBinder.Discovery;
-using EndpointHostBinder.Models;
 using EndpointTests.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RzR.Infrastructure.EndpointHosting.Abstractions;
+using RzR.Infrastructure.EndpointHosting.Discovery;
+using RzR.Infrastructure.EndpointHosting.Models;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -226,10 +227,9 @@ namespace EndpointTests
             {
                 Request =
                 {
-                    Path = new PathString("/func"),
+                    Path = new PathString("/func"), 
                     Method = "GET"
-                },
-                RequestServices = provider
+                }, RequestServices = provider
             };
 
             var handler = router.Find(ctx);

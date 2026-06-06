@@ -26,14 +26,8 @@
 
 		<RootNamespace>RzR.Infrastructure.EndpointHosting</RootNamespace>
 		<AssemblyName>RzR.Infrastructure.EndpointHosting</AssemblyName>
-		<!-- Suppress EOL warnings for net5.0 and net7.0: these TFMs are intentionally
-		     included to support consumers who have not yet migrated off out-of-support runtimes. -->
+
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
-		<!-- IsTrimmable and IsAotCompatible are intentionally NOT set to true.
-		     The library uses LINQ expression-tree compilation and Assembly.GetTypes()
-		     reflection that are not fully trim/AOT-safe. Relevant members are annotated
-		     with [RequiresUnreferencedCode], [RequiresDynamicCode], and
-		     [DynamicallyAccessedMembers] on NET5_0_OR_GREATER TFMs only. -->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

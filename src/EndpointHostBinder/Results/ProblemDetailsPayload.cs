@@ -23,13 +23,14 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Internal DTO that maps to the RFC 7807 problem-details object members.
     /// </summary>
-    /// =================================================================================================
     internal sealed class ProblemDetailsPayload
     {
+        [JsonPropertyName("code")]
+        public string Code { get; set; }
+
         [JsonPropertyName("type")]
         public string Type { get; set; }
 

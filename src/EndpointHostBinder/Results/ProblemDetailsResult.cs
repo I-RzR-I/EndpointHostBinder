@@ -34,6 +34,7 @@ namespace RzR.Infrastructure.EndpointHosting.Results
     ///     An <see cref="IEndpointHostResult" /> that writes an RFC 7807 Problem Details response
     ///     (<c>application/problem+json</c>) with configurable <c>type</c>, <c>title</c>,
     ///     <c>status</c>, <c>detail</c>, and <c>instance</c> fields.
+    ///     And also a custom field: <c>code</c>
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
     public sealed class ProblemDetailsResult : IEndpointHostResult
@@ -58,15 +59,28 @@ namespace RzR.Infrastructure.EndpointHosting.Results
         /// <param name="instance">
         ///     (Optional) A URI reference that identifies the specific occurrence of the problem.
         /// </param>
+        /// <param name="code">
+        ///     (Optional)
+        ///     The problem code.
+        /// </param>
         public ProblemDetailsResult(string title, string detail = null, int statusCode = 500,
-            string type = null, string instance = null)
+            string type = null, string instance = null, string code = null)
         {
             Title = title ?? string.Empty;
             Detail = detail;
             Status = statusCode;
             Type = type;
             Instance = instance;
+            Code = code;
         }
+
+        /// <summary>
+        ///     Gets the problem code (custom field).
+        /// </summary>
+        /// <value>
+        ///     The problem code.
+        /// </value>
+        public string Code { get; }
 
         /// <summary>
         ///     Gets the problem type URI (RFC 7807 <c>type</c> field).
@@ -150,7 +164,8 @@ namespace RzR.Infrastructure.EndpointHosting.Results
                 Title = Title,
                 Status = Status,
                 Detail = Detail,
-                Instance = Instance
+                Instance = Instance,
+                Code = Code
             };
 
             return JsonSerializer.Serialize(problem, SerializerOptions);

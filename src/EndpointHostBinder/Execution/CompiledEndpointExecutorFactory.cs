@@ -33,7 +33,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RzR.Infrastructure.EndpointHosting.Execution
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A factory that builds pre-compiled, delegate-based <see cref="ICompiledEndpointExecutor"/>
     ///     instances for <see cref="IEndpointHostRequestHandler"/> implementations. By compiling
@@ -42,14 +41,13 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
     /// </summary>
     /// <remarks>
     ///     Trim/AOT limitation: this factory uses LINQ expression-tree compilation and reflection
-    ///     over handler types at registration time. It is not trim-safe or Native-AOT-safe on its own.
-    ///     When publishing with trimming or Native AOT, prefer the explicit generic
+    ///     over handler types at registration time. It is not trim-safe or Native-AOT-safe on its
+    ///     own. When publishing with trimming or Native AOT, prefer the explicit generic
     ///     <c>AddHostEndpoint&lt;T&gt;()</c> registration path which avoids assembly scanning.
+    /// 
     /// </remarks>
-    /// =================================================================================================
     internal static class CompiledEndpointExecutorFactory
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Creates an <see cref="ICompiledEndpointExecutor"/> that dispatches requests via the
         ///     asynchronous <see cref="IEndpointHostRequestHandler.RequestProcessAsync"/> path.
@@ -66,7 +64,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
         /// <returns>
         ///     A compiled <see cref="ICompiledEndpointExecutor"/> backed by an async delegate.
         /// </returns>
-        /// =================================================================================================
 #if NET5_0_OR_GREATER
         [RequiresUnreferencedCode(
             "This method uses reflection and LINQ expression-tree compilation over the handler type. " +
@@ -88,7 +85,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
             return new CompiledEndpointExecutor(compiled);
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Creates an <see cref="ICompiledEndpointExecutor"/> that dispatches requests via the
         ///     synchronous <see cref="IEndpointHostRequestHandler.RequestProcess"/> path.
@@ -105,7 +101,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
         /// <returns>
         ///     A compiled <see cref="ICompiledEndpointExecutor"/> backed by a synchronous delegate.
         /// </returns>
-        /// =================================================================================================
 #if NET5_0_OR_GREATER
         [RequiresUnreferencedCode(
             "This method uses reflection and LINQ expression-tree compilation over the handler type. " +
@@ -127,7 +122,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
             return new CompiledEndpointExecutor(compiled);
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds executor task.
         /// </summary>
@@ -138,7 +132,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
         /// <returns>
         ///     A function delegate that yields a Task&lt;IEndpointHostResult&gt;
         /// </returns>
-        /// =================================================================================================
 #if NET5_0_OR_GREATER
         [RequiresUnreferencedCode(
             "Reflects over handlerType members to build the executor expression tree.")]
@@ -184,7 +177,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
             return lambda.Compile();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds an executor.
         /// </summary>
@@ -195,7 +187,6 @@ namespace RzR.Infrastructure.EndpointHosting.Execution
         /// <returns>
         ///     A function delegate that yields an IEndpointHostResult.
         /// </returns>
-        /// =================================================================================================
 #if NET5_0_OR_GREATER
         [RequiresUnreferencedCode(
             "Reflects over handlerType members to build the executor expression tree.")]

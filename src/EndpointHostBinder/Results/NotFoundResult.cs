@@ -1,4 +1,4 @@
-// ***********************************************************************
+﻿// ***********************************************************************
 //  Assembly          : RzR.Shared.Services.EndpointHostBinder
 //  Author            : RzR
 //  Created           : 04-06-2026 20:06
@@ -27,13 +27,11 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that produces an HTTP 404 Not Found response with
     ///     an empty body.
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
     public sealed class NotFoundResult : IEndpointHostResult
     {
         /// <inheritdoc />

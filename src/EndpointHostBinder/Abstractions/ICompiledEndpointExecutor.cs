@@ -24,16 +24,13 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Abstractions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Defines the contract for a pre-compiled delegate that dispatches an incoming HTTP request
     ///     to its associated <see cref="IEndpointHostRequestHandler"/> and writes the produced
     ///     <see cref="IEndpointHostResult"/> to the response.
     /// </summary>
-    /// =================================================================================================
     public interface ICompiledEndpointExecutor
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Asynchronously dispatches the HTTP request to the compiled handler delegate, awaits the
         ///     resulting <see cref="IEndpointHostResult"/>, and writes it to the response.
@@ -45,16 +42,13 @@ namespace RzR.Infrastructure.EndpointHosting.Abstractions
         /// <returns>
         ///     A <see cref="Task"/> that completes when the response has been written.
         /// </returns>
-        /// =================================================================================================
         Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Synchronously dispatches the HTTP request to the compiled handler delegate and writes
-        ///     the resulting <see cref="IEndpointHostResult"/> to the response.
+        ///     Synchronously dispatches the HTTP request to the compiled handler delegate and writes the
+        ///     resulting <see cref="IEndpointHostResult"/> to the response.
         /// </summary>
         /// <param name="context">The current HTTP context for the request being processed.</param>
-        /// =================================================================================================
         void Execute(HttpContext context);
     }
 }

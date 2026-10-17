@@ -24,16 +24,13 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Abstractions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Defines the contract for handling an incoming HTTP request routed to a specific endpoint.
-    ///     Implementations contain the application logic for processing the request and returning
-    ///     an <see cref="IEndpointHostResult"/> that writes the response.
+    ///     Implementations contain the application logic for processing the request and returning an
+    ///     <see cref="IEndpointHostResult"/> that writes the response.
     /// </summary>
-    /// =================================================================================================
     public interface IEndpointHostRequestHandler
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Asynchronously processes the incoming HTTP request and returns the result to be written
         ///     to the response.
@@ -46,19 +43,16 @@ namespace RzR.Infrastructure.EndpointHosting.Abstractions
         ///     A <see cref="Task{TResult}"/> whose result is an <see cref="IEndpointHostResult"/>
         ///     that will be executed to write the HTTP response.
         /// </returns>
-        /// =================================================================================================
         Task<IEndpointHostResult> RequestProcessAsync(HttpContext context, CancellationToken cancellationToken = default);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Synchronously processes the incoming HTTP request and returns the result to be written
-        ///     to the response.
+        ///     Synchronously processes the incoming HTTP request and returns the result to be written to
+        ///     the response.
         /// </summary>
         /// <param name="context">The current HTTP context for the request being handled.</param>
         /// <returns>
         ///     An <see cref="IEndpointHostResult"/> that will be executed to write the HTTP response.
         /// </returns>
-        /// =================================================================================================
         IEndpointHostResult RequestProcess(HttpContext context);
     }
 }

@@ -23,15 +23,12 @@ using System;
 
 namespace RzR.Infrastructure.EndpointHosting.Configuration
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Configuration options that control the behaviour of the endpoint host infrastructure,
     ///     including path-matching semantics and fall-through handling.
     /// </summary>
-    /// =================================================================================================
     public class EndpointHostOptions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the <see cref="StringComparison" /> used when matching an incoming request
         ///     path against registered endpoint paths.
@@ -44,10 +41,8 @@ namespace RzR.Infrastructure.EndpointHosting.Configuration
         /// <value>
         ///     The <see cref="StringComparison" /> strategy for path matching.
         /// </value>
-        /// =================================================================================================
         public StringComparison PathComparison { get; set; } = StringComparison.OrdinalIgnoreCase;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets a value indicating whether a request that matches an endpoint path but whose
         ///     endpoint has no compiled executor should be forwarded to the next middleware
@@ -64,7 +59,6 @@ namespace RzR.Infrastructure.EndpointHosting.Configuration
         ///     <see langword="true" /> to call the next middleware when no executor is found;
         ///     <see langword="false" /> to short-circuit.
         /// </value>
-        /// =================================================================================================
         public bool PassThroughOnNoExecutor { get; set; } = true;
     }
 }

@@ -23,18 +23,18 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.Models.OpenApi
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Represents a minimal JSON Schema object used to describe a parameter's value type.
     /// </summary>
-    /// =================================================================================================
     public sealed class OpenApiSchema
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets or sets the JSON Schema primitive type (e.g. <c>string</c>, <c>integer</c>).
+        ///     Gets or sets the JSON Schema primitive type (e.g. <c>string</c>, <c>integer</c>). Gets or
+        ///     sets the JSON Schema primitive type (e.g. <c>string</c>, <c>integer</c>).
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The type.
+        /// </value>
         [JsonPropertyName("type")]
         public string Type { get; set; }
     }

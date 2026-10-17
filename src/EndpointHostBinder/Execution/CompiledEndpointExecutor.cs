@@ -27,47 +27,37 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Execution
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A compiled endpoint executor. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.ICompiledEndpointExecutor"/>
-    /// =================================================================================================
     internal sealed class CompiledEndpointExecutor : ICompiledEndpointExecutor
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the executor.
         /// </summary>
-        /// =================================================================================================
         private readonly Func<HttpContext, IServiceProvider, Task<IEndpointHostResult>> _executorTask;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the executor.
         /// </summary>
-        /// =================================================================================================
         private readonly Func<HttpContext, IServiceProvider, IEndpointHostResult> _executor;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="CompiledEndpointExecutor"/> class.
         /// </summary>
         /// <param name="executor">The executor.</param>
-        /// =================================================================================================
         public CompiledEndpointExecutor(Func<HttpContext, IServiceProvider, Task<IEndpointHostResult>> executor)
             => _executorTask = executor;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="CompiledEndpointExecutor"/> class backed
-        ///     by a synchronous handler delegate.
+        ///     Initializes a new instance of the <see cref="CompiledEndpointExecutor"/> class backed by
+        ///     a synchronous handler delegate.
         /// </summary>
         /// <param name="executor">
         ///     A compiled delegate that resolves the handler from the DI container, invokes
         ///     <see cref="IEndpointHostRequestHandler.RequestProcess"/>, and returns the result.
         /// </param>
-        /// =================================================================================================
         public CompiledEndpointExecutor(Func<HttpContext, IServiceProvider, IEndpointHostResult> executor)
             => _executor = executor;
 

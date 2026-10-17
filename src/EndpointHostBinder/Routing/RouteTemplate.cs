@@ -26,40 +26,39 @@ using System.Collections.Generic;
 
 namespace RzR.Infrastructure.EndpointHosting.Routing
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Represents a precompiled route template for a single-segment-parameter path such as
     ///     <c>/users/{id}</c> or <c>/orders/{orderId}/items/{itemId}</c>. Literal segments are
     ///     compared using the <see cref="StringComparison" /> derived from
     ///     <see cref="Configuration.EndpointHostOptions.PathComparison" />. Parameter segments
-    ///     (surrounded by <c>{</c> and <c>}</c>) capture the corresponding request path segment
-    ///     into a name-to-value dictionary.
+    ///     (surrounded by <c>{</c> and <c>}</c>) capture the corresponding request path segment into
+    ///     a name-to-value dictionary.
     /// </summary>
     /// <remarks>
     ///     Catch-all parameters (<c>{*rest}</c>) are <b>not</b> supported. If a template segment
     ///     begins with <c>*</c> after the opening brace (e.g. <c>{*rest}</c>) the asterisk is
     ///     treated as part of the parameter name — it will never match a multi-segment path.
     ///     Specificity is measured by <see cref="LiteralCount" />: a template with more literal
-    ///     segments is preferred over one with fewer when multiple templates match the same
-    ///     request path. This keeps precedence deterministic and simple.
+    ///     segments is preferred over one with fewer when multiple templates match the same request
+    ///     path. This keeps precedence deterministic and simple.
     /// </remarks>
-    /// =================================================================================================
     internal sealed class RouteTemplate
     {
         private readonly string[] _literals;
         private readonly string[] _paramNames;
         private readonly bool[] _isCapture;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new <see cref="RouteTemplate" /> by parsing the path stored on
         ///     <paramref name="endpoint" /> into segment descriptors that can be evaluated at request
         ///     time without further string allocations beyond the captured values.
         /// </summary>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when one or more arguments have unsupported or illegal values.
+        /// </exception>
         /// <param name="endpoint">
         ///     The registered endpoint whose <see cref="Models.Endpoint.Path" /> contains the template.
         /// </param>
-        /// =================================================================================================
         internal RouteTemplate(Endpoint endpoint)
         {
             Endpoint = endpoint;
@@ -85,13 +84,19 @@ namespace RzR.Infrastructure.EndpointHosting.Routing
                     // Capture segment — name is everything between the braces.
                     var name = seg.Substring(1, seg.Length - 2);
                     if (name.IsMissing())
+                    {
                         throw new ArgumentException(
                             $"Route template '{rawPath}' contains an empty parameter name in segment '{seg}'. Parameter names must be non-empty.",
                             nameof(endpoint));
+                    }
+
                     if (paramList.Contains(name))
+                    {
                         throw new ArgumentException(
                             $"Route template '{rawPath}' declares a duplicate parameter name '{name}'. Parameter names must be unique within a template.",
                             nameof(endpoint));
+                    }
+
                     _isCapture[i] = true;
                     _paramNames[i] = name;
                     paramList.Add(name);
@@ -108,50 +113,51 @@ namespace RzR.Infrastructure.EndpointHosting.Routing
             ParameterNames = paramList.AsReadOnly();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the <see cref="Endpoint" /> associated with this template.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The endpoint.
+        /// </value>
         internal Endpoint Endpoint { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the number of literal segments in this template.  Used as a specificity score:
         ///     higher is more specific (preferred over templates with more capture segments).
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The number of literals.
+        /// </value>
         internal int LiteralCount { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the ordered names of the path parameters declared in the template.  The order
         ///     matches the segment positions in the template path, skipping literal segments.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     A list of names of the parameters.
+        /// </value>
         internal IReadOnlyList<string> ParameterNames { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Determines whether <paramref name="requestSegments" /> match this template and, when
-        ///     they do, populates <paramref name="values" /> with the captured parameter values.
+        ///     Determines whether <paramref name="requestSegments" /> match this template and, when they
+        ///     do, populates <paramref name="values" /> with the captured parameter values.
         /// </summary>
         /// <param name="requestSegments">
-        ///     The non-empty path segments split from the incoming request path. The segment count
-        ///     must equal the template's segment count for a match.
+        ///     The non-empty path segments split from the incoming request path. The segment count must
+        ///     equal the template's segment count for a match.
         /// </param>
         /// <param name="comparison">
         ///     The <see cref="StringComparison" /> used for literal segment matching, derived from
         ///     <see cref="Configuration.EndpointHostOptions.PathComparison" />.
         /// </param>
         /// <param name="values">
-        ///     When the method returns <see langword="true" />, contains the captured
-        ///     parameter values keyed by parameter name; otherwise the dictionary is empty.
+        ///     [out] When the method returns <see langword="true" />, contains the captured parameter
+        ///     values keyed by parameter name; otherwise the dictionary is empty.
         /// </param>
         /// <returns>
         ///     <see langword="true" /> if every segment matches; otherwise <see langword="false" />.
         /// </returns>
-        /// =================================================================================================
         internal bool TryMatch(
             string[] requestSegments, StringComparison comparison,
             out Dictionary<string, string> values)

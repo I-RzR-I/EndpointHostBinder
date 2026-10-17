@@ -31,45 +31,35 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Host
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Core middleware that intercepts incoming HTTP requests, matches them against
-    ///     registered endpoints via <see cref="IEndpointHostRouter"/>, and dispatches execution to
-    ///     the matching endpoint's <see cref="ICompiledEndpointExecutor"/>. Requests that do not
-    ///     match any active endpoint are forwarded to the next middleware in the pipeline.
+    ///     Core middleware that intercepts incoming HTTP requests, matches them against registered
+    ///     endpoints via <see cref="IEndpointHostRouter"/>, and dispatches execution to the matching
+    ///     endpoint's <see cref="ICompiledEndpointExecutor"/>. Requests that do not match any active
+    ///     endpoint are forwarded to the next middleware in the pipeline.
     /// </summary>
-    /// =================================================================================================
     public class EndpointHostBinderMiddleware
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the logger.
         /// </summary>
-        /// =================================================================================================
         private readonly ILogger<EndpointHostBinderMiddleware> _logger;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the next.
         /// </summary>
-        /// =================================================================================================
         private readonly RequestDelegate _next;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the endpoint host options.
         /// </summary>
-        /// =================================================================================================
         private readonly EndpointHostOptions _options;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="EndpointHostBinderMiddleware" /> class.
         /// </summary>
         /// <param name="next">The next middleware delegate in the request pipeline.</param>
         /// <param name="logger">The logger used to record diagnostic and warning messages.</param>
         /// <param name="options">The endpoint host options controlling fall-through behaviour.</param>
-        /// =================================================================================================
         public EndpointHostBinderMiddleware(
             RequestDelegate next, ILogger<EndpointHostBinderMiddleware> logger, EndpointHostOptions options)
         {
@@ -78,12 +68,11 @@ namespace RzR.Infrastructure.EndpointHosting.Host
             _options = options ?? new EndpointHostOptions();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Processes the incoming HTTP request. If the router finds a matching active endpoint the
-        ///     request is dispatched to its compiled executor; otherwise the request is forwarded to
-        ///     the next middleware in the pipeline. Any unhandled exception is logged at the critical
-        ///     level and re-thrown.
+        ///     request is dispatched to its compiled executor; otherwise the request is forwarded to the
+        ///     next middleware in the pipeline. Any unhandled exception is logged at the critical level
+        ///     and re-thrown.
         /// </summary>
         /// <param name="context">The current HTTP context for the request being processed.</param>
         /// <param name="router">
@@ -92,7 +81,6 @@ namespace RzR.Infrastructure.EndpointHosting.Host
         /// <returns>
         ///     A <see cref="Task"/> that completes when the request has been handled or forwarded.
         /// </returns>
-        /// =================================================================================================
         public async Task InvokeAsync(HttpContext context, IEndpointHostRouter router)
         {
             context.ThrowIfArgNull(nameof(context));

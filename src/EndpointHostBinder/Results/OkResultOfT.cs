@@ -29,7 +29,6 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that produces an HTTP 200 OK response whose body is
     ///     the JSON-serialized form of <typeparamref name="T" />, with Content-Type
@@ -45,12 +44,10 @@ namespace RzR.Infrastructure.EndpointHosting.Results
     ///     <c>null</c>.
     /// </typeparam>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
     public sealed class OkResult<T> : IEndpointHostResult
     {
         private const string JsonContentType = "application/json; charset=utf-8";
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="OkResult{T}" /> class.
         /// </summary>
@@ -59,31 +56,26 @@ namespace RzR.Infrastructure.EndpointHosting.Results
         ///     (Optional) The <see cref="JsonSerializerOptions" /> to use. Pass <see langword="null" />
         ///     to use the System.Text.Json defaults.
         /// </param>
-        /// =================================================================================================
         public OkResult(T payload, JsonSerializerOptions serializerOptions = null)
         {
             Payload = payload;
             SerializerOptions = serializerOptions;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the payload that will be serialized to JSON.
         /// </summary>
         /// <value>
         ///     The payload value.
         /// </value>
-        /// =================================================================================================
         public T Payload { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the serializer options used when serializing <see cref="Payload" />.
         /// </summary>
         /// <value>
         ///     The <see cref="JsonSerializerOptions" />, or <see langword="null" /> to use defaults.
         /// </value>
-        /// =================================================================================================
         public JsonSerializerOptions SerializerOptions { get; }
 
         /// <inheritdoc />

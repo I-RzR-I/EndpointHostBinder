@@ -1,3 +1,9 @@
+### **v3.1.0.857** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 18-10-2026
+* [a927ca2] (RzR) -> Auto commit uncommited files
+* [2929b8c] (RzR) -> Add new custom field into `ProblemDetailsPayload`.
+* [5609f9e] (RzR) -> Update the methods summary to use the same pattern.
+* [398764d] (RzR) -> Upgrade the ref Extension package version.
+
 ### **v3.0.0.733** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 07-06-2026
 * [DEV] (RzR) -> Renames the assembly, root namespace, and NuGet package from EndpointHostBinder to RzR.Infrastructure.EndpointHosting, expands the target matrix, and adds a large feature set on top of the existing controller-less endpoint middleware.
 * [DEV] (RzR) -> Add EndpointHostOptions: configurable PathComparison (default OrdinalIgnoreCase) and PassThroughOnNoExecutor (default true), wired via RegisterEndpointHostBuilder(Action<EndpointHostOptions>).

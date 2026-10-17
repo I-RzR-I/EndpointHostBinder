@@ -24,37 +24,38 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.Models.OpenApi
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Represents a single operation (method + path combination) in an OpenAPI path item.
     /// </summary>
-    /// =================================================================================================
     public sealed class OpenApiOperation
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the unique string used to identify the operation.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The identifier of the operation.
+        /// </value>
         [JsonPropertyName("operationId")]
         public string OperationId { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the path (and other) parameters for this operation.
         ///     <see langword="null" /> when the endpoint has no path parameters; the JSON serializer
         ///     omits the field entirely in that case due to
         ///     <see cref="JsonIgnoreCondition.WhenWritingNull" />.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The parameters.
+        /// </value>
         [JsonPropertyName("parameters")]
         public List<OpenApiParameter> Parameters { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the response objects keyed by HTTP status code string (e.g. <c>"200"</c>).
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The responses.
+        /// </value>
         [JsonPropertyName("responses")]
         public Dictionary<string, OpenApiResponse> Responses { get; set; }
     }

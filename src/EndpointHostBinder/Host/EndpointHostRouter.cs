@@ -35,7 +35,6 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Host
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Routes incoming HTTP requests to the matching registered <see cref="Endpoint"/> by
     ///     comparing the request path and HTTP method against the collection of endpoints provided
@@ -74,7 +73,7 @@ namespace RzR.Infrastructure.EndpointHosting.Host
     ///     <para>
     ///         Captured route values are written to <see cref="HttpContext.Items"/> under
     ///         <see cref="HttpContextRouteValuesExtensions.RouteValuesItemKey"/> as an
-    ///         <see cref="IReadOnlyDictionary{TKey,TValue}"/> of <c>string -> string</c>.  For
+    ///         <see cref="IReadOnlyDictionary{TKey,TValue}"/> of <c>string -&gt; string</c>.  For
     ///         literal matches no entry is written.  Callers should use
     ///         <see cref="HttpContextRouteValuesExtensions.GetEndpointRouteValues"/> or
     ///         <see cref="HttpContextRouteValuesExtensions.GetEndpointRouteValue"/> to read values.
@@ -85,82 +84,67 @@ namespace RzR.Infrastructure.EndpointHosting.Host
     ///         occurs per request.
     ///     </para>
     /// </remarks>
-    /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostRouter" />
-    /// =================================================================================================
+    /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostRouter">
+    ///     =================================================================================================
+    /// </seealso>
     public sealed class EndpointHostRouter : IEndpointHostRouter
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     (Immutable) path-to-endpoint-bucket lookup built once at construction time.
-        ///     Contains only literal (non-templated) endpoints.
-        ///     Each bucket holds all endpoints registered under a given normalised path.
+        ///     (Immutable) path-to-endpoint-bucket lookup built once at construction time. Contains only
+        ///     literal (non-templated) endpoints. Each bucket holds all endpoints registered under a
+        ///     given normalised path.
         /// </summary>
-        /// =================================================================================================
         private readonly Dictionary<string, List<Endpoint>> _lookup;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) precompiled route templates for all endpoints whose path contains a
         ///     <c>{name}</c> segment, sorted descending by <see cref="RouteTemplate.LiteralCount"/>
         ///     so the most specific template is evaluated first.
         /// </summary>
-        /// =================================================================================================
         private readonly List<RouteTemplate> _templates;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the <see cref="StringComparison"/> configured via
         ///     <see cref="EndpointHostOptions.PathComparison"/> — used for literal-segment matching
         ///     inside template evaluation.
         /// </summary>
-        /// =================================================================================================
         private readonly StringComparison _pathComparison;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     (Immutable) flat snapshot of all registered endpoints, in registration order.
-        ///     Exposed by <see cref="GetEndpoints"/> for metadata consumers such as the OpenAPI
-        ///     document builder.
+        ///     (Immutable) flat snapshot of all registered endpoints, in registration order. Exposed by <see cref="GetEndpoints"/>
+        ///     for metadata consumers such as the OpenAPI document builder.
         /// </summary>
-        /// =================================================================================================
         private readonly IReadOnlyCollection<Endpoint> _allEndpoints;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the logger.
         /// </summary>
-        /// =================================================================================================
         private readonly ILogger<EndpointHostRouter> _logger;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EndpointHostRouter" /> class using
-        ///     default <see cref="EndpointHostOptions"/>.
+        ///     Initializes a new instance of the <see cref="EndpointHostRouter" /> class using default <see cref="EndpointHostOptions"/>
+        ///     .
         /// </summary>
         /// <param name="endpoints">
-        ///     The collection of registered <see cref="Endpoint"/> instances to route against.
-        ///     The collection is snapshotted into a lookup dictionary at construction time.
+        ///     The collection of registered <see cref="Endpoint"/> instances to route against. The
+        ///     collection is snapshotted into a lookup dictionary at construction time.
         /// </param>
         /// <param name="logger">The logger used to record diagnostic and warning messages.</param>
-        /// =================================================================================================
         public EndpointHostRouter(IEnumerable<Endpoint> endpoints, ILogger<EndpointHostRouter> logger)
             : this(endpoints, logger, new EndpointHostOptions()) { }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EndpointHostRouter" /> class with
-        ///     explicit <see cref="EndpointHostOptions"/>.
+        ///     Initializes a new instance of the <see cref="EndpointHostRouter" /> class with explicit <see cref="EndpointHostOptions"/>.
         /// </summary>
         /// <param name="endpoints">
-        ///     The collection of registered <see cref="Endpoint"/> instances to route against.
-        ///     The collection is snapshotted into a lookup dictionary at construction time.
+        ///     The collection of registered <see cref="Endpoint"/> instances to route against. The
+        ///     collection is snapshotted into a lookup dictionary at construction time.
         /// </param>
         /// <param name="logger">The logger used to record diagnostic and warning messages.</param>
         /// <param name="options">
-        ///     The <see cref="EndpointHostOptions"/> that control path-matching case-sensitivity
-        ///     and fall-through behaviour.
+        ///     The <see cref="EndpointHostOptions"/> that control path-matching case-sensitivity and
+        ///     fall-through behaviour.
         /// </param>
-        /// =================================================================================================
         public EndpointHostRouter(IEnumerable<Endpoint> endpoints, ILogger<EndpointHostRouter> logger,
             EndpointHostOptions options)
         {
@@ -203,7 +187,6 @@ namespace RzR.Infrastructure.EndpointHosting.Host
             return Task.FromResult(Find(context, false).IsNotNull());
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Core match implementation shared by <see cref="Find(HttpContext)" /> and
         ///     <see cref="Exist" />/<see cref="ExistAsync" />. When <paramref name="writeRouteValues" />
@@ -217,8 +200,9 @@ namespace RzR.Infrastructure.EndpointHosting.Host
         ///     <see cref="HttpContext.Items" /> (used by <see cref="Find(HttpContext)" />);
         ///     <see langword="false" /> for a side-effect-free existence check.
         /// </param>
-        /// <returns>The matched <see cref="Endpoint"/>, or <see langword="null"/> if none matched.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     The matched <see cref="Endpoint"/>, or <see langword="null"/> if none matched.
+        /// </returns>
         private Endpoint Find(HttpContext context, bool writeRouteValues)
         {
             var requestPath = context.Request.Path.Value;
@@ -272,7 +256,6 @@ namespace RzR.Infrastructure.EndpointHosting.Host
         /// <inheritdoc />
         public IReadOnlyCollection<Endpoint> GetEndpoints() => _allEndpoints;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds the literal lookup dictionary and the sorted template list from
         ///     <paramref name="endpoints"/>, separating each endpoint into the appropriate
@@ -280,15 +263,14 @@ namespace RzR.Infrastructure.EndpointHosting.Host
         /// </summary>
         /// <param name="endpoints">All registered endpoints.</param>
         /// <param name="pathComparison">
-        ///     The configured path comparison, used both for the dictionary key comparer and for
-        ///     the initial sort of templates (templates themselves use it at match time).
+        ///     The configured path comparison, used both for the dictionary key comparer and for the
+        ///     initial sort of templates (templates themselves use it at match time).
         /// </param>
-        /// <param name="lookup">Receives the literal-path dictionary.</param>
+        /// <param name="lookup">[out] Receives the literal-path dictionary.</param>
         /// <param name="templates">
-        ///     Receives the template list, sorted descending by
+        ///     [out] Receives the template list, sorted descending by
         ///     <see cref="RouteTemplate.LiteralCount"/> (most specific first).
         /// </param>
-        /// =================================================================================================
         private static void BuildStructures(IEnumerable<Endpoint> endpoints, StringComparison pathComparison,
             out Dictionary<string, List<Endpoint>> lookup, out List<RouteTemplate> templates)
         {
@@ -320,7 +302,6 @@ namespace RzR.Infrastructure.EndpointHosting.Host
             templates.Sort((a, b) => b.LiteralCount.CompareTo(a.LiteralCount));
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Returns the first active endpoint in <paramref name="bucket"/> whose
         ///     <c>AllowedMethods</c> constraint matches <paramref name="requestMethod"/>, or
@@ -328,19 +309,19 @@ namespace RzR.Infrastructure.EndpointHosting.Host
         /// </summary>
         /// <remarks>
         ///     <c>IsActive</c> is evaluated at lookup time (not pre-filtered during construction) so
-        ///     that the active-wins shadowing semantics are preserved for endpoints registered under
-        ///     the same path.  HTTP method names are compared with
+        ///     that the active-wins shadowing semantics are preserved for endpoints registered under the
+        ///     same path.  HTTP method names are compared with
         ///     <see cref="StringComparison.OrdinalIgnoreCase"/> — the HTTP specification treats
         ///     method tokens as case-insensitive.
         /// </remarks>
         /// <param name="bucket">The candidate endpoints registered under a single path.</param>
         /// <param name="requestMethod">The HTTP method string from the incoming request.</param>
-        /// <returns>The first matching active <see cref="Endpoint"/>, or <see langword="null"/>.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     The first matching active <see cref="Endpoint"/>, or <see langword="null"/>.
+        /// </returns>
         private static Endpoint FindInBucket(List<Endpoint> bucket, string requestMethod)
             => bucket.FirstOrDefault(x => x.IsActive && MethodMatches(x, requestMethod));
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Returns <see langword="true"/> if <paramref name="endpoint"/> accepts
         ///     <paramref name="requestMethod"/> — either because no method constraint is declared
@@ -348,45 +329,46 @@ namespace RzR.Infrastructure.EndpointHosting.Host
         /// </summary>
         /// <param name="endpoint">The endpoint to test.</param>
         /// <param name="requestMethod">The HTTP method from the incoming request.</param>
-        /// <returns><see langword="true"/> if the method is accepted; otherwise <see langword="false"/>.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     <see langword="true"/> if the method is accepted; otherwise <see langword="false"/>.
+        /// </returns>
         private static bool MethodMatches(Endpoint endpoint, string requestMethod)
             => endpoint.AllowedMethods.IsNullOrEmptyEnumerable() ||
                endpoint.AllowedMethods.Any(m =>
                    string.Equals(m.Method, requestMethod, StringComparison.OrdinalIgnoreCase));
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Returns <see langword="true"/> if <paramref name="path"/> contains at least one
         ///     <c>{name}</c> segment and therefore should be treated as a route template.
         /// </summary>
         /// <param name="path">The raw path value from <see cref="Endpoint.Path"/>.</param>
-        /// <returns><see langword="true"/> when the path is templated; <see langword="false"/> otherwise.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     <see langword="true"/> when the path is templated; <see langword="false"/> otherwise.
+        /// </returns>
         private static bool IsTemplated(string path)
             => path.IndexOf('{') >= 0;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Splits <paramref name="requestPath"/> on <c>/</c>, discarding empty entries produced
-        ///     by the leading slash that ASP.NET Core always prepends to
+        ///     Splits <paramref name="requestPath"/> on <c>/</c>, discarding empty entries produced by
+        ///     the leading slash that ASP.NET Core always prepends to
         ///     <see cref="HttpRequest.Path"/>.
         /// </summary>
         /// <param name="requestPath">The raw path string from the request.</param>
-        /// <returns>A non-null array of non-empty segment strings.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     A non-null array of non-empty segment strings.
+        /// </returns>
         private static string[] SplitPath(string requestPath)
             => (requestPath ?? string.Empty).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Returns the <see cref="StringComparer"/> that corresponds to the given
         ///     <see cref="StringComparison"/> value so that the dictionary key-comparer and the
         ///     individual string comparisons use identical semantics.
         /// </summary>
         /// <param name="comparison">The <see cref="StringComparison"/> to map.</param>
-        /// <returns>A <see cref="StringComparer"/> matching <paramref name="comparison"/>.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     A <see cref="StringComparer"/> matching <paramref name="comparison"/>.
+        /// </returns>
         private static StringComparer GetComparerFor(StringComparison comparison)
         {
             switch (comparison)

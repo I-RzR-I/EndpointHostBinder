@@ -28,29 +28,23 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that writes a plain-text (or custom content-type)
     ///     string body with a configurable HTTP status code.
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
     public sealed class TextResult : IEndpointHostResult
     {
         private const string DefaultContentType = "text/plain; charset=utf-8";
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="TextResult" /> class.
         /// </summary>
         /// <param name="text">The response body text.</param>
-        /// <param name="statusCode">
-        ///     (Optional) The HTTP status code. Defaults to 200.
-        /// </param>
+        /// <param name="statusCode">(Optional) The HTTP status code. Defaults to 200.</param>
         /// <param name="contentType">
         ///     (Optional) The Content-Type header. Defaults to <c>text/plain; charset=utf-8</c>.
         /// </param>
-        /// =================================================================================================
         public TextResult(string text, int statusCode = 200, string contentType = null)
         {
             Text = text ?? string.Empty;
@@ -58,34 +52,28 @@ namespace RzR.Infrastructure.EndpointHosting.Results
             ContentType = string.IsNullOrEmpty(contentType) ? DefaultContentType : contentType;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the text body that will be written to the response.
         /// </summary>
         /// <value>
         ///     The response body text.
         /// </value>
-        /// =================================================================================================
         public string Text { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the HTTP status code that will be applied to the response.
         /// </summary>
         /// <value>
         ///     The HTTP status code (e.g. 200).
         /// </value>
-        /// =================================================================================================
         public int StatusCode { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the Content-Type header value.
         /// </summary>
         /// <value>
         ///     The Content-Type header value (default: <c>text/plain; charset=utf-8</c>).
         /// </value>
-        /// =================================================================================================
         public string ContentType { get; }
 
         /// <inheritdoc />

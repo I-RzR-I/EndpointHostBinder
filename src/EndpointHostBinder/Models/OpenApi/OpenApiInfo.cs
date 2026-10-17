@@ -23,26 +23,26 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.Models.OpenApi
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Represents the <c>info</c> object in an OpenAPI document.
     /// </summary>
-    /// =================================================================================================
     public sealed class OpenApiInfo
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the API title.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The title.
+        /// </value>
         [JsonPropertyName("title")]
         public string Title { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the API version string.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The version.
+        /// </value>
         [JsonPropertyName("version")]
         public string Version { get; set; }
     }

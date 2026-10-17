@@ -24,35 +24,36 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.Models.OpenApi
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Represents the root OpenAPI 3.0.x document object.
     /// </summary>
-    /// =================================================================================================
     public sealed class OpenApiDocument
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the OpenAPI specification version string (e.g. <c>3.0.1</c>).
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The openapi.
+        /// </value>
         [JsonPropertyName("openapi")]
         public string Openapi { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the document metadata (title and version).
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The information.
+        /// </value>
         [JsonPropertyName("info")]
         public OpenApiInfo Info { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets or sets the path items, keyed by path string (e.g. <c>/api/resource</c>).
-        ///     Each value maps lowercase HTTP method verbs to their operation objects.
+        ///     Gets or sets the path items, keyed by path string (e.g. <c>/api/resource</c>). Each value
+        ///     maps lowercase HTTP method verbs to their operation objects.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The paths.
+        /// </value>
         [JsonPropertyName("paths")]
         public Dictionary<string, Dictionary<string, OpenApiOperation>> Paths { get; set; }
     }

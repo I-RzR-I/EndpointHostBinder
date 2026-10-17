@@ -33,15 +33,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RzR.Infrastructure.EndpointHosting.Discovery
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Provides extension methods for automatic discovery and registration of
     ///     <see cref="IEndpointHostRequestHandler"/> implementations from an assembly.
     /// </summary>
-    /// =================================================================================================
     public static class EndpointDiscoveryExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Scans the given <paramref name="assembly"/> for all concrete, non-abstract types that
         ///     implement <see cref="IEndpointHostRequestHandler"/> and are decorated with
@@ -66,7 +63,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
 #if NET5_0_OR_GREATER
         [RequiresUnreferencedCode(
             "This method calls Assembly.GetTypes() which is not trim-safe. " +
@@ -76,7 +72,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
             this IServiceCollection services, Assembly assembly)
             => AddHostEndpointsFromAssembly(services, assembly, ServiceLifetime.Transient);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Scans the given <paramref name="assembly"/> for all concrete, non-abstract types that
         ///     implement <see cref="IEndpointHostRequestHandler"/> and are decorated with
@@ -106,7 +101,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
 #if NET5_0_OR_GREATER
         [RequiresUnreferencedCode(
             "This method calls Assembly.GetTypes() which is not trim-safe. " +

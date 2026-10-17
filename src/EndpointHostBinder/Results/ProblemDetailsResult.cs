@@ -30,14 +30,12 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that writes an RFC 7807 Problem Details response
     ///     (<c>application/problem+json</c>) with configurable <c>type</c>, <c>title</c>,
     ///     <c>status</c>, <c>detail</c>, and <c>instance</c> fields.
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
     public sealed class ProblemDetailsResult : IEndpointHostResult
     {
         private const string ProblemJsonContentType = "application/problem+json; charset=utf-8";
@@ -48,7 +46,6 @@ namespace RzR.Infrastructure.EndpointHosting.Results
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="ProblemDetailsResult" /> class.
         /// </summary>
@@ -56,16 +53,11 @@ namespace RzR.Infrastructure.EndpointHosting.Results
         /// <param name="detail">
         ///     (Optional) A human-readable explanation of this specific occurrence of the problem.
         /// </param>
-        /// <param name="statusCode">
-        ///     (Optional) The HTTP status code. Defaults to 500.
-        /// </param>
-        /// <param name="type">
-        ///     (Optional) A URI reference that identifies the problem type.
-        /// </param>
+        /// <param name="statusCode">(Optional) The HTTP status code. Defaults to 500.</param>
+        /// <param name="type">(Optional) A URI reference that identifies the problem type.</param>
         /// <param name="instance">
         ///     (Optional) A URI reference that identifies the specific occurrence of the problem.
         /// </param>
-        /// =================================================================================================
         public ProblemDetailsResult(string title, string detail = null, int statusCode = 500,
             string type = null, string instance = null)
         {
@@ -76,56 +68,46 @@ namespace RzR.Infrastructure.EndpointHosting.Results
             Instance = instance;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the problem type URI (RFC 7807 <c>type</c> field).
         /// </summary>
         /// <value>
         ///     The type URI, or <see langword="null" /> when omitted.
         /// </value>
-        /// =================================================================================================
         public string Type { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the short human-readable summary of the problem (RFC 7807 <c>title</c> field).
         /// </summary>
         /// <value>
         ///     The problem title.
         /// </value>
-        /// =================================================================================================
         public string Title { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the HTTP status code (RFC 7807 <c>status</c> field).
         /// </summary>
         /// <value>
         ///     The HTTP status code (default: 500).
         /// </value>
-        /// =================================================================================================
         public int Status { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets the human-readable explanation of this specific occurrence of the problem
-        ///     (RFC 7807 <c>detail</c> field).
+        ///     Gets the human-readable explanation of this specific occurrence of the problem (RFC 7807 <c>
+        ///     detail</c> field).
         /// </summary>
         /// <value>
         ///     The problem detail, or <see langword="null" /> when omitted.
         /// </value>
-        /// =================================================================================================
         public string Detail { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets the URI reference that identifies the specific occurrence of the problem
-        ///     (RFC 7807 <c>instance</c> field).
+        ///     Gets the URI reference that identifies the specific occurrence of the problem (RFC 7807 <c>
+        ///     instance</c> field).
         /// </summary>
         /// <value>
         ///     The instance URI, or <see langword="null" /> when omitted.
         /// </value>
-        /// =================================================================================================
         public string Instance { get; }
 
         /// <inheritdoc />
@@ -154,12 +136,12 @@ namespace RzR.Infrastructure.EndpointHosting.Results
             context.Response.Body.Write(bytes, 0, bytes.Length);
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds the RFC 7807 problem-details JSON body.
         /// </summary>
-        /// <returns>The serialized problem-details JSON string.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     The serialized problem-details JSON string.
+        /// </returns>
         private string BuildBody()
         {
             var problem = new ProblemDetailsPayload

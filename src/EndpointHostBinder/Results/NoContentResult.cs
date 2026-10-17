@@ -27,13 +27,13 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that produces an HTTP 204 No Content response with
     ///     an empty body.
     /// </summary>
-    /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
+    /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult">
+    ///     =================================================================================================
+    /// </seealso>
     public sealed class NoContentResult : IEndpointHostResult
     {
         /// <inheritdoc />

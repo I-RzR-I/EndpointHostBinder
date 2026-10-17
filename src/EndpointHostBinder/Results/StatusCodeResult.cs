@@ -27,31 +27,25 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that sets the HTTP response status code and writes
     ///     no body.
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
     public sealed class StatusCodeResult : IEndpointHostResult
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="StatusCodeResult" /> class.
         /// </summary>
         /// <param name="statusCode">The HTTP status code to set on the response.</param>
-        /// =================================================================================================
         public StatusCodeResult(int statusCode) => StatusCode = statusCode;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the HTTP status code that will be applied to the response.
         /// </summary>
         /// <value>
         ///     The HTTP status code (e.g. 200, 404, 500).
         /// </value>
-        /// =================================================================================================
         public int StatusCode { get; }
 
         /// <inheritdoc />

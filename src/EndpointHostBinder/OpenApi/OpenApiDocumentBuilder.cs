@@ -32,27 +32,23 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.OpenApi
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Builds a minimal but valid OpenAPI 3.0.x document from the endpoints registered with an
     ///     <see cref="IEndpointHostRouter" />. The document is self-contained and produced with
     ///     System.Text.Json — no Swashbuckle or other third-party dependency is required.
     /// </summary>
-    /// =================================================================================================
     public sealed class OpenApiDocumentBuilder
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        ///     (Immutable)
         ///     The default document title used when none is supplied.
         /// </summary>
-        /// =================================================================================================
         public const string DefaultTitle = "EndpointHostBinder API";
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        ///     (Immutable)
         ///     The default document version used when none is supplied.
         /// </summary>
-        /// =================================================================================================
         public const string DefaultVersion = "1.0.0";
 
         private static readonly JsonSerializerOptions SerializerOptions = new()
@@ -68,7 +64,6 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
         private readonly string _title;
         private readonly string _version;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="OpenApiDocumentBuilder" /> class with
         ///     default document title and version.
@@ -76,13 +71,11 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
         /// <param name="router">
         ///     The router whose registered endpoints will be reflected into the OpenAPI document.
         /// </param>
-        /// =================================================================================================
         public OpenApiDocumentBuilder(IEndpointHostRouter router)
             : this(router, DefaultTitle, DefaultVersion)
         {
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="OpenApiDocumentBuilder" /> class with a
         ///     configurable document title and version.
@@ -90,13 +83,10 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
         /// <param name="router">
         ///     The router whose registered endpoints will be reflected into the OpenAPI document.
         /// </param>
-        /// <param name="title">
-        ///     The API title placed in the document's <c>info.title</c> field.
-        /// </param>
+        /// <param name="title">The API title placed in the document's <c>info.title</c> field.</param>
         /// <param name="version">
         ///     The API version placed in the document's <c>info.version</c> field.
         /// </param>
-        /// =================================================================================================
         public OpenApiDocumentBuilder(IEndpointHostRouter router, string title, string version)
         {
             router.ThrowIfArgNull(nameof(router));
@@ -106,7 +96,6 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
             _version = string.IsNullOrEmpty(version) ? DefaultVersion : version;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds the OpenAPI 3.0.1 document as a strongly-typed object graph.
         /// </summary>
@@ -118,13 +107,13 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
         ///     state, which is useful for documentation or administrative tooling.
         /// </remarks>
         /// <param name="includeInactive">
-        ///     When <see langword="true" />, inactive endpoints are included in the document.
-        ///     Defaults to <see langword="false" /> (inactive endpoints are excluded).
+        ///     (Optional)
+        ///     When <see langword="true" />, inactive endpoints are included in the document. Defaults
+        ///     to <see langword="false" /> (inactive endpoints are excluded).
         /// </param>
         /// <returns>
         ///     An <see cref="OpenApiDocument" /> that represents the matching registered endpoints.
         /// </returns>
-        /// =================================================================================================
         public OpenApiDocument Build(bool includeInactive = false)
         {
             var endpoints = _router.GetEndpoints();
@@ -173,38 +162,40 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
             };
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds the OpenAPI 3.0.1 document and serializes it to a JSON string using
         ///     System.Text.Json.
         /// </summary>
         /// <param name="includeInactive">
-        ///     When <see langword="true" />, inactive endpoints are included in the document.
-        ///     Defaults to <see langword="false" /> (inactive endpoints are excluded).
-        ///     Forwarded directly to <see cref="Build(bool)" />.
+        ///     (Optional)
+        ///     When <see langword="true" />, inactive endpoints are included in the document. Defaults
+        ///     to <see langword="false" /> (inactive endpoints are excluded). Forwarded directly to <see cref="Build(bool)" />
+        ///     .
         /// </param>
-        /// <returns>A JSON string representing the complete OpenAPI document.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     A JSON string representing the complete OpenAPI document.
+        /// </returns>
         public string BuildJson(bool includeInactive = false)
             => JsonSerializer.Serialize(Build(includeInactive), SerializerOptions);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Builds a minimal <see cref="OpenApiOperation" /> for a single endpoint, containing
-        ///     an <c>operationId</c>, an optional <c>parameters</c> array for path parameters, and
-        ///     a generic 200 response.
+        ///     Builds a minimal <see cref="OpenApiOperation" /> for a single endpoint, containing an <c>
+        ///     operationId</c>, an optional <c>parameters</c> array for path parameters, and a generic
+        ///     200 response.
         /// </summary>
         /// <param name="operationId">
-        ///     The value to place in the operation's <c>operationId</c> field, derived from the
-        ///     endpoint name.
+        ///     The value to place in the operation's <c>operationId</c> field, derived from the endpoint
+        ///     name.
         /// </param>
         /// <param name="pathParameters">
+        ///     (Optional)
         ///     The names of path parameters extracted from the endpoint path template (e.g.
         ///     <c>id</c> for <c>/users/{id}</c>).  Pass <see langword="null" /> or an empty list
         ///     for literal endpoints — no <c>parameters</c> array will be emitted.
         /// </param>
-        /// <returns>A new <see cref="OpenApiOperation" /> instance.</returns>
-        /// =================================================================================================
+        /// <returns>
+        ///     A new <see cref="OpenApiOperation" /> instance.
+        /// </returns>
         private static OpenApiOperation BuildOperation(string operationId, IReadOnlyList<string> pathParameters = null)
         {
             List<OpenApiParameter> parameters = null;
@@ -238,18 +229,17 @@ namespace RzR.Infrastructure.EndpointHosting.OpenApi
             };
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Extracts the ordered parameter names from an OpenAPI / route template path string.
         ///     Returns an empty list for literal paths that contain no <c>{name}</c> segments.
         /// </summary>
         /// <param name="path">
-        ///     The endpoint path value (e.g. <c>/users/{id}</c> or <c>/orders/{orderId}/items/{itemId}</c>).
+        ///     The endpoint path value (e.g. <c>/users/{id}</c> or <c>/orders/{orderId}/items/{itemId}</c>
+        ///     ).
         /// </param>
         /// <returns>
         ///     An ordered list of parameter name strings; empty when the path has no parameters.
         /// </returns>
-        /// =================================================================================================
         private static IReadOnlyList<string> ExtractPathParameters(string path)
         {
             if (path.IsMissing() || path.IndexOf('{') < 0)

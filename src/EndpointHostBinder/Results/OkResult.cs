@@ -27,13 +27,11 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Results
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An <see cref="IEndpointHostResult" /> that produces an HTTP 200 OK response with an empty
     ///     body. Use <see cref="OkResult{T}" /> to include a JSON payload.
     /// </summary>
     /// <seealso cref="T:RzR.Infrastructure.EndpointHosting.Abstractions.IEndpointHostResult" />
-    /// =================================================================================================
     public sealed class OkResult : IEndpointHostResult
     {
         /// <inheritdoc />

@@ -31,16 +31,13 @@ using System.Net.Http;
 
 namespace RzR.Infrastructure.EndpointHosting.Discovery
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Provides extension methods for registering the endpoint host infrastructure and individual
     ///     <see cref="IEndpointHostRequestHandler"/> implementations into the ASP.NET Core
     ///     dependency-injection container and middleware pipeline.
     /// </summary>
-    /// =================================================================================================
     public static class DependencyInjection
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers the core endpoint host infrastructure into the DI container using default
         ///     <see cref="EndpointHostOptions"/>. Specifically, registers
@@ -55,11 +52,9 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection RegisterEndpointHostBuilder(this IServiceCollection builder)
             => RegisterEndpointHostBuilder(builder, _ => { });
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers the core endpoint host infrastructure into the DI container with a custom
         ///     <see cref="EndpointHostOptions"/> configuration. Specifically, registers
@@ -70,6 +65,9 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         ///     This method must be called before <see cref="UseEndpointHostBuilder"/>. It is also a
         ///     prerequisite for any <c>AddHostEndpoint</c> registration to function correctly.
         /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown when one or more required arguments are null.
+        /// </exception>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="configure">
         ///     A delegate that configures the <see cref="EndpointHostOptions"/> before the
@@ -78,7 +76,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection RegisterEndpointHostBuilder(this IServiceCollection builder,
             Action<EndpointHostOptions> configure)
         {
@@ -94,22 +91,19 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
             return builder;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Inserts <see cref="EndpointHostBinderMiddleware"/> into the ASP.NET Core request
-        ///     pipeline. The middleware intercepts every request, checks whether it matches a
-        ///     registered endpoint, and — if so — dispatches it to the compiled handler executor.
-        ///     Unmatched requests are forwarded to the next middleware.
+        ///     pipeline. The middleware intercepts every request, checks whether it matches a registered
+        ///     endpoint, and — if so — dispatches it to the compiled handler executor. Unmatched
+        ///     requests are forwarded to the next middleware.
         /// </summary>
         /// <param name="builder">The <see cref="IApplicationBuilder"/> to configure.</param>
         /// <returns>
         ///     The same <see cref="IApplicationBuilder"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IApplicationBuilder UseEndpointHostBuilder(this IApplicationBuilder builder)
             => builder.UseMiddleware<EndpointHostBinderMiddleware>();
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> that responds to any HTTP
         ///     method. <typeparamref name="T"/> is registered as a transient service and a compiled
@@ -120,28 +114,30 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path)
             where T : class, IEndpointHostRequestHandler
             => AddHostEndpoint<T>(builder, name, path, ServiceLifetime.Transient);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> that responds to any HTTP
-        ///     method, using the specified DI <paramref name="lifetime"/> for the handler.
-        ///     A compiled <see cref="Models.Endpoint"/> singleton is always added for routing.
+        ///     method, using the specified DI <paramref name="lifetime"/> for the handler. A compiled <see cref="Models.Endpoint"/>
+        ///     singleton is always added for routing.
         /// </summary>
         /// <typeparam name="T">
         ///     The <see cref="IEndpointHostRequestHandler"/> implementation to register.
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="lifetime">
         ///     The <see cref="ServiceLifetime"/> used when registering the handler. Defaults to
         ///     <see cref="ServiceLifetime.Transient"/> to preserve backward-compatible behaviour.
@@ -149,7 +145,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, ServiceLifetime lifetime)
             where T : class, IEndpointHostRequestHandler
@@ -162,17 +157,18 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
             return builder;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Registers a single endpoint handler <typeparamref name="T"/> with an explicit active/
-        ///     inactive flag and no HTTP method restriction.
+        ///     Registers a single endpoint handler <typeparamref name="T"/> with an explicit
+        ///     active/inactive flag and no HTTP method restriction.
         /// </summary>
         /// <typeparam name="T">
         ///     The <see cref="IEndpointHostRequestHandler"/> implementation to register.
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="isActive">
         ///     <see langword="true"/> to enable the endpoint so it handles matching requests;
         ///     <see langword="false"/> to register it as inactive (requests will fall through).
@@ -180,16 +176,14 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, bool isActive)
             where T : class, IEndpointHostRequestHandler
             => AddHostEndpoint<T>(builder, name, path, isActive, ServiceLifetime.Transient);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Registers a single endpoint handler <typeparamref name="T"/> with an explicit active/
-        ///     inactive flag, no HTTP method restriction, and the specified DI
+        ///     Registers a single endpoint handler <typeparamref name="T"/> with an explicit
+        ///     active/inactive flag, no HTTP method restriction, and the specified DI
         ///     <paramref name="lifetime"/> for the handler.
         ///     A compiled <see cref="Models.Endpoint"/> singleton is always added for routing.
         /// </summary>
@@ -198,7 +192,9 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="isActive">
         ///     <see langword="true"/> to enable the endpoint so it handles matching requests;
         ///     <see langword="false"/> to register it as inactive (requests will fall through).
@@ -210,7 +206,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, bool isActive, ServiceLifetime lifetime)
             where T : class, IEndpointHostRequestHandler
@@ -223,7 +218,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
             return builder;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> using a pre-configured
         ///     <see cref="Models.Endpoint"/> instance. If <paramref name="endpoint"/> does not yet have
@@ -235,31 +229,30 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="endpoint">
-        ///     A fully configured <see cref="Models.Endpoint"/> that describes the endpoint's name,
-        ///     path, active state, and allowed HTTP methods.
+        ///     A fully configured <see cref="Models.Endpoint"/> that describes the endpoint's name, path,
+        ///     active state, and allowed HTTP methods.
         /// </param>
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder, Endpoint endpoint)
             where T : class, IEndpointHostRequestHandler
             => AddHostEndpoint<T>(builder, endpoint, ServiceLifetime.Transient);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> using a pre-configured
         ///     <see cref="Models.Endpoint"/> instance and the specified DI <paramref name="lifetime"/>
         ///     for the handler. If <paramref name="endpoint"/> does not yet have a compiled executor
         ///     assigned, one is built automatically via <see cref="CompiledEndpointExecutorFactory"/>.
+        /// 
         /// </summary>
         /// <typeparam name="T">
         ///     The <see cref="IEndpointHostRequestHandler"/> implementation to register.
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="endpoint">
-        ///     A fully configured <see cref="Models.Endpoint"/> that describes the endpoint's name,
-        ///     path, active state, and allowed HTTP methods.
+        ///     A fully configured <see cref="Models.Endpoint"/> that describes the endpoint's name, path,
+        ///     active state, and allowed HTTP methods.
         /// </param>
         /// <param name="lifetime">
         ///     The <see cref="ServiceLifetime"/> used when registering the handler. Defaults to
@@ -268,7 +261,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder, Endpoint endpoint,
             ServiceLifetime lifetime)
             where T : class, IEndpointHostRequestHandler
@@ -283,7 +275,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
             return builder;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> that responds only to the
         ///     specified HTTP methods. The endpoint is active by default.
@@ -293,7 +284,9 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="allowedMethods">
         ///     The HTTP methods this endpoint accepts (e.g. <see cref="HttpMethod.Get"/>,
         ///     <see cref="HttpMethod.Post"/>). Pass <see langword="null"/> or an empty array to accept
@@ -302,25 +295,25 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, HttpMethod[] allowedMethods)
             where T : class, IEndpointHostRequestHandler
             => AddHostEndpoint<T>(builder, name, path, allowedMethods, ServiceLifetime.Transient);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> that responds only to the
-        ///     specified HTTP methods, using the specified DI <paramref name="lifetime"/> for the handler.
-        ///     The endpoint is active by default. A compiled <see cref="Models.Endpoint"/> singleton is
-        ///     always added for routing.
+        ///     specified HTTP methods, using the specified DI <paramref name="lifetime"/> for the
+        ///     handler. The endpoint is active by default. A compiled <see cref="Models.Endpoint"/>
+        ///     singleton is always added for routing.
         /// </summary>
         /// <typeparam name="T">
         ///     The <see cref="IEndpointHostRequestHandler"/> implementation to register.
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="allowedMethods">
         ///     The HTTP methods this endpoint accepts (e.g. <see cref="HttpMethod.Get"/>,
         ///     <see cref="HttpMethod.Post"/>). Pass <see langword="null"/> or an empty array to accept
@@ -333,7 +326,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, HttpMethod[] allowedMethods, ServiceLifetime lifetime)
             where T : class, IEndpointHostRequestHandler
@@ -346,7 +338,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
             return builder;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> with full control over the
         ///     active flag and the set of accepted HTTP methods.
@@ -356,7 +347,9 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="isActive">
         ///     <see langword="true"/> to enable the endpoint so it handles matching requests;
         ///     <see langword="false"/> to register it as inactive (requests will fall through).
@@ -369,13 +362,11 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, bool isActive, HttpMethod[] allowedMethods)
             where T : class, IEndpointHostRequestHandler
             => AddHostEndpoint<T>(builder, name, path, isActive, allowedMethods, ServiceLifetime.Transient);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a single endpoint handler <typeparamref name="T"/> with full control over the
         ///     active flag, the set of accepted HTTP methods, and the DI <paramref name="lifetime"/>
@@ -387,7 +378,9 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// </typeparam>
         /// <param name="builder">The <see cref="IServiceCollection"/> to register services into.</param>
         /// <param name="name">A display name for the endpoint used in logging.</param>
-        /// <param name="path">The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).</param>
+        /// <param name="path">
+        ///     The URL path the endpoint is mapped to (e.g. <c>/api/my-endpoint</c>).
+        /// </param>
         /// <param name="isActive">
         ///     <see langword="true"/> to enable the endpoint so it handles matching requests;
         ///     <see langword="false"/> to register it as inactive (requests will fall through).
@@ -404,7 +397,6 @@ namespace RzR.Infrastructure.EndpointHosting.Discovery
         /// <returns>
         ///     The same <see cref="IServiceCollection"/> instance so that calls can be chained.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddHostEndpoint<T>(this IServiceCollection builder,
             string name, string path, bool isActive, HttpMethod[] allowedMethods, ServiceLifetime lifetime)
             where T : class, IEndpointHostRequestHandler

@@ -24,15 +24,13 @@ using System.Threading.Tasks;
 
 namespace RzR.Infrastructure.EndpointHosting.Abstractions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Represents the result produced by an <see cref="IEndpointHostRequestHandler"/>, responsible
-    ///     for writing the final HTTP response (status code, headers, body) to the current context.
+    ///     Represents the result produced by an <see cref="IEndpointHostRequestHandler"/>,
+    ///     responsible for writing the final HTTP response (status code, headers, body) to the
+    ///     current context.
     /// </summary>
-    /// =================================================================================================
     public interface IEndpointHostResult
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Asynchronously writes the endpoint result to the HTTP response.
         /// </summary>
@@ -43,15 +41,12 @@ namespace RzR.Infrastructure.EndpointHosting.Abstractions
         /// <returns>
         ///     A <see cref="Task"/> that completes when the response has been written.
         /// </returns>
-        /// =================================================================================================
         Task ExecuteAsync(HttpContext context, CancellationToken cancellationToken = default);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Synchronously writes the endpoint result to the HTTP response.
         /// </summary>
         /// <param name="context">The current HTTP context whose response will be populated.</param>
-        /// =================================================================================================
         void Execute(HttpContext context);
     }
 }

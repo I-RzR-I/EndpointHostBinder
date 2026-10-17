@@ -23,18 +23,17 @@ using System.Text.Json.Serialization;
 
 namespace RzR.Infrastructure.EndpointHosting.Models.OpenApi
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Represents a single response entry in an OpenAPI operation's <c>responses</c> map.
     /// </summary>
-    /// =================================================================================================
     public sealed class OpenApiResponse
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the human-readable description of this response.
         /// </summary>
-        /// =================================================================================================
+        /// <value>
+        ///     The description.
+        /// </value>
         [JsonPropertyName("description")]
         public string Description { get; set; }
     }
